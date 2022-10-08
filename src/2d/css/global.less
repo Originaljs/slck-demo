@@ -1,0 +1,68 @@
+@theme-color: "#264f80"; // 用户mata 的name属性值为 theme-color 时，用户的浏览器将根据所设定的建议颜色来改变用户界面
+@border-color: "grey";
+@background-color: "transparent";
+@gap: 8px;// 设置网格行与列之间的间隙( row-gap 和 column-gap 的简写)
+@fontsize: 14px;
+@fontsize-title: 18px;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box; //为元素指定的任何内边距和边框都将在已设定的宽度和高度内进行绘制。
+}
+button {
+  border: none;
+  outline: none; // 取消轮廓样式、颜色、宽度
+}
+
+button:focus {
+  border: none;
+  outline: none;
+}
+
+ul,
+li,
+ol {
+  list-style: none;// list-style-type list-style-position list-style-image
+}
+
+.text-one-ellipsis { // 文本溢出样式 文本只显示一行，超出部分裁剪
+  display: block;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+@font-face{
+  font-family: 'LianMengQiYiLuShuaiZhengRuiHeiTi'; 
+  src: url('@/2d/css/font/LianMengQiYiLuShuaiZhengRuiHeiTi-2.ttf') format('truetype');
+}
+// 定义动画
+@keyframes left-in{
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+@keyframes right-in{
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+// 引用动画
+section{
+  // transition: all 0.5s ease;
+  // transition: all 2s ease-in;
+  // transform: translateX(-100%);
+  &.left{
+    animation: left-in 0.5s ease-in;
+  }
+  &.right{
+    animation: right-in 0.5s ease-in;
+  }
+}
