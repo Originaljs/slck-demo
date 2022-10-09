@@ -9,7 +9,7 @@ export default defineConfig({
   //项目根目录
   root: process.cwd(),
   //项目部署的基础路径
-  base: "/",
+  base: './',
   plugins: [
     vue(),
     eslint(),

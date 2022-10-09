@@ -13,6 +13,7 @@
     "ant-design-vue": "^3.3.0-beta.3",
     "axios": "^1.1.2",
     "echarts": "^5.4.0",
+    "terser": "^5.15.1",
     "vite-plugin-style-import": "^2.0.0",
     "vue": "^3.2.37",
     "vue-router": "^4.0.13"
