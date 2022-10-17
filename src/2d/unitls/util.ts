@@ -52,7 +52,7 @@ function formatterDate(type = "Y-M-D h:m:s", date?: any) {
  * @param {Number} delay 间隔时间，默认值100
  * @param {Boolean} promptly 是否立即执行，默认false
  * **/
-const debounce = (fn: Function, delay = 100, promptly: boolean) => {
+const debounce = (fn: Function, delay = 100, promptly?: boolean) => {
   let timer: any = null;
   return function (...args: any[]) {
     // 立即执行
