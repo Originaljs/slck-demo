@@ -1,42 +1,45 @@
 .main {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  background: url(../assets/img/home/网格bg.png) no-repeat center bottom/100%;
+  background-color: #0c2d40;
+  user-select: none; // 不可选取文本
+  overflow: hidden;
+
+  .load {
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 45%;
+    left: 45%;
+    width: 100px;
+    height: 100px;
     display: flex;
     flex-direction: column;
-    background: url(../assets/img/home/网格bg.png) no-repeat center bottom/100%;
-    background-color: #0c2d40;
-    user-select: none;
-    overflow: hidden;
-    .load{
-      position:  absolute;
-      top: 45%;
-      left: 45%;
-      width: 100px;
-      height: 100px;
-      display: flex;
-      flex-direction: column;
-      color: rgb(55 117 230 / 85%);
-      .text-tip{
-        position: absolute;
-        top:  58%;
-        left: 10%;
-        font-size: 18px;
-      }
-    }
-    .header{
-      width: calc(100% - 1.5rem);
-      height: 1.225rem;
-      margin: 0 0.75rem;
+    color: rgb(55 117 230 / 85%);
+
+    .text-tip {
       position: absolute;
-      top: 0px;
-      left: 0px;
-      box-sizing: border-box;
-      z-index: 3;
-      background: url(../assets/img/home/top.png) no-repeat bottom center / 100%;
+      top: 58%;
+      left: 10%;
+      font-size: 18px;
     }
+  }
+
+  .header {
+    width: calc(100% - 1.5rem);
+    height: 1.225rem;
+    margin: 0 0.75rem;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    box-sizing: border-box;
+    z-index: 3;
+    background: url(../assets/img/home/top.png) no-repeat bottom center / 100%;
+
     .logo {
       width: 0.8875rem;
       height: 0.45rem;
@@ -44,16 +47,14 @@
       margin-left: 0.25rem;
       margin-top: 0.4125rem;
     }
-  
+
     .title {
       font-size: 0.425rem;
       font-weight: bold;
-      background: linear-gradient(
-        0deg,
-        #05b1ae 0%,
-        #06b1ae 29.6875%,
-        #ffffff 60.009765625%
-      );
+      background: linear-gradient(0deg,
+          #05b1ae 0%,
+          #06b1ae 29.6875%,
+          #ffffff 60.009765625%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       position: absolute;
@@ -62,4 +63,40 @@
       line-height: 0.525rem;
       top: 0.25rem;
     }
+
+    .time {
+      float: right;
+      font-size: 0.175rem;
+      color: #fff;
+      line-height: 0.275rem;
+      margin-top: 0.475rem;
+    }
   }
+
+  .footer {
+    width: 13rem;
+    height: 1.3rem;
+    background: url(../assets/img/home/按钮背景.png) no-repeat center center / 100% 100%;
+    position: absolute;
+    bottom: 0;
+    left: calc(50% - 6.5rem);
+    display: flex;
+    justify-content: center;
+    padding-top: 0.6rem;
+    box-sizing: border-box;
+    z-index: 3;
+    // 背景色叠加
+    &::after {
+      content: "";
+      display: block;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: url(../assets/img/home/按钮背景.png) no-repeat center center / 100% 100%;
+      z-index: -1;
+    }
+
+  }
+}
