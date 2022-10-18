@@ -3,7 +3,7 @@ const routes = [
     {
         path: '/',
         name: 'index',
-        component: () => import('../components/HelloWorld.vue')
+        component: () => import('@/2d/components/views/homePage.vue')
     }
 ]
 const routers = createRouter({

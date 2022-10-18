@@ -1,0 +1,185 @@
+section.left,
+section.right {
+    margin-top: 4%;
+}
+
+.aq_day {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+
+    .num {
+        width: 1.7875rem;
+        height: 1.2625rem;
+        font-size: 0.275rem;
+        text-align: center;
+        margin-left: 0.1875rem;
+        background: url(../assets/img/home/num.png) no-repeat center / 100%;
+        color: #fff;
+        padding-top: 0.325rem;
+        font-style: italic;
+        font-weight: bold;
+        line-height: 0.375rem;
+    }
+
+    .text {
+        width: 2.1375rem;
+        padding: 0.175rem 0.325rem;
+        color: #fff;
+        background: url(../assets/img/home/背景框.png) no-repeat center center /100% 100%;
+
+        .day {
+            font-size: 0.15rem;
+            margin-bottom: 0.1rem;
+
+            span {
+                font-size: 0.225rem;
+                color: #12ffff;
+                font-style: italic;
+                font-weight: bold;
+                margin-right: 0.0625rem;
+            }
+        }
+    }
+
+}
+
+.pds {
+    width: 100%;
+    height: 100%;
+    padding: 0 0.15rem;
+
+    .pds-list {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        margin-top: 0.525rem;
+
+        .item {
+            .circle {
+                width: 1.2125rem;
+                height: 0.9875rem;
+                font-size: 0.2375rem;
+                color: #fff;
+                font-weight: bold;
+                font-style: italic;
+                line-height: 0.3375rem;
+                text-align: center;
+                padding: 0.35rem 0 0.3rem;
+                margin: 0 auto;
+            }
+
+            .title {
+                width: 1.5875rem;
+                height: 0.4375rem;
+                font-size: 0.1625rem;
+                line-height: 0.4375rem;
+                color: #fff;
+                text-align: center;
+                margin-top: 0.2rem;
+            }
+
+            &.green {
+                .circle {
+                    background: url(../assets/img/home/绿.png) no-repeat center /100%;
+                }
+
+                .title {
+                    background: url('../assets/img/home/绿(1).png') no-repeat center /100%;
+                }
+            }
+
+            &.sky {
+                .circle {
+                    background: url(../assets/img/home/浅蓝.png) no-repeat center /100%;
+                }
+
+                .title {
+                    background: url('../assets/img/home/浅蓝(1).png') no-repeat center /100%;
+                }
+            }
+        }
+    }
+}
+
+.total-order {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    position: relative;
+
+    .order-left {
+        width: 2.175rem;
+        height: 1.2rem;
+        position: relative;
+        margin-left: 0.25rem;
+        background: url(../assets/img/home/图标.png) no-repeat center center / 100%;
+
+        .img {
+            width: 0.9125rem;
+            height: 0.9625rem;
+            position: absolute;
+            left: 50%;
+            // transform: translate(-50%);
+            margin-left: -0.45rem;
+            bottom: 0.5rem;
+            animation: bouce 4s linear infinite;
+
+        }
+    }
+
+    .order-right {
+        font-size: 0.175rem;
+        color: #fff;
+        line-height: 0.275rem;
+        margin-left: 0.3rem;
+        flex: 1;
+        // font-weight: bold;
+
+        .num {
+            font-size: 0.375rem;
+            color: #2bd9ff;
+            font-weight: bold;
+            line-height: 0.475rem;
+        }
+
+        .order-footer {
+            position: absolute;
+            color: rgb(179, 179, 179);
+            margin-top: 0.4rem;
+            text-align: right;
+            left: 0;
+            right: 0;
+            padding-right: 0.2rem;
+        }
+        & >.p{
+            margin-bottom: 0;
+        }
+    }
+
+
+}
+
+@keyframes bouce {
+    0% {
+        transform: translateY(0);
+    }
+
+    25% {
+        transform: translateY(-0.125rem);
+    }
+
+    50% {
+        transform: translateY(0);
+    }
+
+    75% {
+        transform: translateY(0.125rem);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}

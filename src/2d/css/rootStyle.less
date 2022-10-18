@@ -73,6 +73,25 @@
     }
   }
 
+  .content {
+    padding: 0.9625rem 0.125rem 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    background: url(../assets/img/home/遮罩.png) no-repeat center center / 100% 100%;
+    .left,
+    .right {
+      pointer-events: auto;
+    }
+  }
+
   .footer {
     width: 13rem;
     height: 1.3rem;
@@ -85,6 +104,23 @@
     padding-top: 0.6rem;
     box-sizing: border-box;
     z-index: 3;
+
+    .item {
+      margin: 0 0.325rem;
+      width: 1.2rem;
+      height: 0.5125rem;
+      font-size: 0.225rem;
+      color: rgba(221, 235, 235, 0.4);
+      line-height: 0.5125rem;
+      text-align: center;
+      // text-decoration: none;
+      background: url(../assets/img/home/不亮.png) no-repeat center center / 100% 100%;
+      &.active{
+        color: #ddebeb;
+        background: url(../assets/img/home/亮.png) no-repeat center center / 100% 100%;
+      }
+    }
+
     // 背景色叠加
     &::after {
       content: "";

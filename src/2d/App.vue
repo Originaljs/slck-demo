@@ -4,27 +4,30 @@
       <a-spin :indicator="indicator" />
       <span class="text-tip"> 正在加载...</span>
     </div>
-    <footer class="header">
+    <header class="header">
       <img class="logo" src="@/2d/assets/img/home/logo.png">
       <h1 class="title">四联测控数字孪生工厂</h1>
       <div class="time"> {{time}}</div>
-    </footer>
-
+    </header>
+    <main class="content">
+      <router-view></router-view>
+    </main>
     <footer class="footer">
-      <!-- <router-link>
-        
-      </router-link> -->
+      <router-link v-for="item in list" :key="item.path" :to="item.path" :class="['item',route.path==item.path?'active':'']">
+        {{item.name}}
+      </router-link>
 
     </footer>
   </div>
 </template>
 
 <script setup lang="ts">
-import HelloWorld from "./components/HelloWorld.vue";
 import { LoadingOutlined } from "@ant-design/icons-vue";
 import { defineComponent, h, ref, shallowRef } from "vue";
 import { formatterDate } from '@/2d/unitls/util'
-
+import { useRoute, useRouter } from "vue-router";
+const route = useRoute();
+const router = useRouter();
 let time = ref(formatterDate("Y年M月D日 星期W h:m"));
 let timmer = setInterval(() => {
   time.value = formatterDate("Y年M月D日 星期W h:m");
