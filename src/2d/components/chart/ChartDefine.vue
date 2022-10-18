@@ -1,7 +1,7 @@
 <template>
   <div class="chart">
     <div
-      ref="chart"
+      ref="echart"
       :style="{ height: height, width: width }"
       @mouseover="chartMouseover"
       @mouseout="chartMouseout"
@@ -77,7 +77,7 @@ const tooltip = reactive({
     borderColor: "rgba(7, 32, 50, .9)",
   },
 });
-
+const echart =ref(null)
 const dataLen = ref(0);
 const chart: any = reactive({ value: "" });
 const intervalTick: any = reactive({ value: "" });
@@ -124,10 +124,10 @@ const setTimer = () => {
 const initChart = (option?: any) => {
   if (!option) option = toRaw(props.chartOption);
   if (!option) return;
-  console.log("this.$refs.chart", attrs.chart);
+  console.log("this.$refs.chart", echart.value);
   dataLen.value = option.series[0].data.length; //数据长度
   chart.value = markRaw(
-    echarts.init(attrs.chart as any, "", {
+    echarts.init(echart.value as any, "", {
       renderer: props.type as any,
     })
   );
