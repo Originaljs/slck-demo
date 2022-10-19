@@ -8,6 +8,10 @@ const routes = [
     path: "/first",
     component: () => import("@/2d/components/views/FirstPage.vue"),
   },
+  {
+    path:'/second',
+    component:()=> import('@/2d/components/views/SecondPage.vue')
+  }
 ];
 const routers = createRouter({
   history: createWebHashHistory(),
