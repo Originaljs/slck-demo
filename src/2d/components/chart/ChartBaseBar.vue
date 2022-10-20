@@ -33,9 +33,11 @@ const props = defineProps({
 .chartBar {
     padding: 0rem 0.1rem;
     .bar-title {
+        
         display: flex;
         padding: 0;
         &>div {
+            margin: 0rem 0.1rem;
             text-align: center;
             font-size: 0.18rem;
             font-weight: bold;
@@ -45,12 +47,14 @@ const props = defineProps({
 
     .bar-content {
         margin-top: 0.19rem;
+        
 
         .item {
             display: flex;
             align-items: center;
             font-size: 0.18rem;
-            padding: 0.16rem 0;
+            padding: -0.16rem 0;
+            height: 0.5rem;
             color: #ffffff;
             margin-top: 0.18rem;
             background: url(../../assets/img/third/scbg_bc.png) no-repeat center center /100% 100%;
@@ -64,7 +68,6 @@ const props = defineProps({
 
             .box {
                 flex: 1;
-
                 .background {
                     background: rgba(27, 38, 56, 1);
                     height: 0.08rem;
