@@ -465,6 +465,254 @@ export const echart = {
       ],
     };
   },
+  seriesBar2() {
+    let colors = [
+      "rgba(60, 170, 183, 1)",
+      "rgba(0, 174, 255, 1)",
+      "rgba(255, 156, 93, 1)",
+    ];
+    let data1 = [
+      {
+        value: 160,
+        name: "5月",
+      },
+      {
+        value: 240,
+        name: "6月",
+      },
+      {
+        value: 90,
+        name: "7月",
+      },
+      {
+        value: 220,
+        name: "8月",
+      },
+      {
+        value: 140,
+        name: "9月",
+      },
+      {
+        value: 300,
+        name: "10月",
+      },
+      {
+        value: 150,
+        name: "11月",
+      },
+    ];
+    let data2 = [
+      {
+        value: 140,
+        name: "5月",
+      },
+      {
+        value: 220,
+        name: "6月",
+      },
+      {
+        value: 50,
+        name: "7月",
+      },
+      {
+        value: 20,
+        name: "8月",
+      },
+      {
+        value: 110,
+        name: "9月",
+      },
+      {
+        value: 250,
+        name: "10月",
+      },
+      {
+        value: 120,
+        name: "11月",
+      },
+    ];
+    let data3 = [
+      {
+        value: 13,
+        name: "5月",
+      },
+      {
+        value: 22,
+        name: "6月",
+      },
+      {
+        value: 19,
+        name: "7月",
+      },
+      {
+        value: 20,
+        name: "8月",
+      },
+      {
+        value: 13,
+        name: "9月",
+      },
+      {
+        value: 20,
+        name: "10月",
+      },
+      {
+        value: 15,
+        name: "11月",
+      },
+    ];
+    return {
+      grid: {
+        top: "20%",
+        left: "5%",
+        right: "5%",
+        bottom: "5%",
+        containLabel: true,
+      },
+      tooltip: {
+        trigger: "axis",
+      },
+      legend: {
+        top: "3%",
+        itemWidth: 16,
+        itemHeight: 16,
+        itemStyle: {
+          borderWidth: 1,
+          borderRadius: 0,
+        },
+        textStyle: {
+          color: "#fff",
+          fontSize: 14,
+        },
+      },
+      yAxis: [
+        {
+          type: "value",
+          axisLine: {
+            show: false,
+            lineStyle: {
+              color: "rgba(255,255,255,.4)",
+            },
+          },
+          axisLabel: {
+            color: "#fff",
+            fontSize: 12,
+          },
+          splitLine: {
+            show: false,
+          },
+        },
+        {
+          type: "value",
+          axisLine: {
+            show: false,
+            lineStyle: {
+              color: "rgba(255,255,255,.4)",
+            },
+          },
+          axisLabel: {
+            color: "#fff",
+            fontSize: 12,
+            formatter: "{value}%",
+          },
+          splitLine: {
+            show: false,
+          },
+        },
+      ],
+      xAxis: [
+        {
+          type: "category",
+          data: data1.map((item) => item.name),
+          axisLabel: {
+            color: "#fff",
+            fontSize: 12,
+          },
+          axisLine: {
+            // show: false,
+            lineStyle: {
+              color: "rgba(18, 36, 65, 1)",
+            },
+          },
+          axisTick: {
+            show: false,
+          },
+        },
+      ],
+      series: [
+        {
+          type: "bar",
+          name: "目标产量",
+          data: data1,
+          itemStyle: {
+            borderWidth: 1,
+            color: {
+              type: "linear",
+              x: 0,
+              y: 1,
+              x2: 0,
+              y2: 0,
+              colorStops: [
+                {
+                  offset: 1,
+                  color: colors[0],
+                },
+                {
+                  offset: 0,
+                  color: "rgba(0,0,0,0)",
+                },
+              ],
+            },
+          },
+          showBackground: true,
+          backgroundStyle: {
+            color: "rgba(6, 29, 50, 0.62)",
+          },
+          // barWidth: 7,
+        },
+        {
+          type: "bar",
+          name: "实际产量",
+          data: data2,
+          itemStyle: {
+            borderWidth: 1,
+            color: {
+              type: "linear",
+              x: 0,
+              y: 1,
+              x2: 0,
+              y2: 0,
+              colorStops: [
+                {
+                  offset: 1,
+                  color: colors[1],
+                },
+                {
+                  offset: 0,
+                  color: "rgba(0,0,0,0)",
+                },
+              ],
+            },
+          },
+          showBackground: true,
+          backgroundStyle: {
+            color: "rgba(6, 29, 50, 0.62)",
+          },
+          // barWidth: 7,
+        },
+        {
+          type: "line",
+          name: "达标率",
+          yAxisIndex: 1,
+          symbol: "emptyCircle",
+          // symbol:
+          //   "image://data:image/gif;base64,R0lGODlhEAAQAMQAAORHHOVSKudfOulrSOp3WOyDZu6QdvCchPGolfO0o/XBs/fNwfjZ0frl3/zy7////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkAABAALAAAAAAQABAAAAVVICSOZGlCQAosJ6mu7fiyZeKqNKToQGDsM8hBADgUXoGAiqhSvp5QAnQKGIgUhwFUYLCVDFCrKUE1lBavAViFIDlTImbKC5Gm2hB0SlBCBMQiB0UjIQA7",
+          color: "rgba(255, 156, 93, 1)",
+          data: data3,
+        },
+      ],
+    };
+  },
   seriesline2() {
     const data = [
       {

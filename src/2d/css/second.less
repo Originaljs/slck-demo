@@ -207,6 +207,40 @@
     }
 }
 
+.process-data {
+    height: 100%;
+    padding: 0.3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .item {
+        display: flex;
+        align-items: center;
+        padding: 0.21rem 0.38rem;
+        background: url(../assets/img/second/process-plan-item-bc.png) no-repeat center center /100% 100%;
+
+        .item-left {
+            flex: 1;
+            color: #f0f1f7;
+            font-size: 0.2rem;
+
+            .text {
+                text-shadow: 0 0 15px #fff;
+            }
+        }
+
+        .item-right {
+            color: rgba(134, 240, 231, 1);
+            font-size: 0.33rem;
+            font-weight: bold;
+            height: 0.25rem;
+            line-height: 0.25rem;
+            font-weight: bold;
+        }
+    }
+}
+
 @keyframes bouce {
     0% {
         transform: translateY(0);

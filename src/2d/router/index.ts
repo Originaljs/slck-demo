@@ -9,9 +9,13 @@ const routes = [
     component: () => import("@/2d/components/views/FirstPage.vue"),
   },
   {
-    path:'/second',
-    component:()=> import('@/2d/components/views/SecondPage.vue')
-  }
+    path: "/second",
+    component: () => import("@/2d/components/views/SecondPage.vue"),
+  },
+  {
+    path: "/thirdly",
+    component: () => import("@/2d/components/views/ThirdPage.vue"),
+  },
 ];
 const routers = createRouter({
   history: createWebHashHistory(),
