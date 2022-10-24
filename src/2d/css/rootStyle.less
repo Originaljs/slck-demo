@@ -135,4 +135,32 @@
     }
 
   }
+.third-button{
+  position: fixed;
+  right: 5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: auto;
+  z-index: 10;
+  .item{
+    width: 1.85rem;
+    height: 0.7rem;
+    display: block;
+    cursor: pointer;
+    font-size: 0.225rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    line-height: 0.7rem;
+    text-shadow: 0rem 0.0125rem 0.0125rem rgba(0, 0, 0, 0.6);
+    background: url(../assets/img/home/BUTTON2.png) no-repeat center center /1.725rem 0.5875rem;
+    margin: 0.125rem 0;
+    &.active{
+      color: #fff;
+      font-weight: bold;
+      background: url(../assets/img/first/BUTTON1.png) no-repeat center center / 100% 100%;
+
+    }
+  }
+}
+
 }
