@@ -13,27 +13,40 @@
       <router-view :line="isLine"></router-view>
     </main>
     <section class="third-button" v-show="route.path == '/thirdly'">
-      <div :class="['item', clickIndex == index + 1 && animate ? 'active' : '']" v-for="(item, index) in buttonList"
-        :key="index" @click="animationRun(index + 1)">
+      <div
+        :class="['item', clickIndex == index + 1 && animate ? 'active' : '']"
+        v-for="(item, index) in buttonList"
+        :key="index"
+        @click="animationRun(index + 1)"
+      >
         {{ item }}
       </div>
     </section>
     <footer class="footer">
-      <router-link v-for="item in list" :key="item.path" :to="item.path"
-        :class="['item', route.path == item.path ? 'active' : '']">
+      <router-link
+        v-for="item in list"
+        :key="item.path"
+        :to="item.path"
+        :class="['item', route.path == item.path ? 'active' : '']"
+      >
         {{ item.name }}
       </router-link>
     </footer>
+    <div class="canvas">
+      <canvas ref="canvasBox" class="canvasBox"></canvas>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { LoadingOutlined } from "@ant-design/icons-vue";
-import { defineComponent, h, ref, shallowRef } from "vue";
+import { defineComponent, h, ref, shallowRef, onMounted } from "vue";
 import { formatterDate } from "@/2d/unitls/util";
 import { useRoute, useRouter } from "vue-router";
+import { pageOnload } from "@/3d/index";
 const route = useRoute();
 const router = useRouter();
+const canvasBox = ref(null);
 let href = window.location.hash;
 if (href.length > 2) {
   router.push("/");
@@ -43,7 +56,7 @@ let timmer = setInterval(() => {
   time.value = formatterDate("Y年M月D日 星期W h:m");
 }, 30 * 1000);
 const isLoad = ref(false);
-const isLine = ref(false)
+const isLine = ref(false);
 // 进度条
 const indicator = h(LoadingOutlined, {
   style: { fontSize: "54px" },
@@ -73,20 +86,22 @@ const list = shallowRef([
 ]);
 const buttonList = shallowRef(["SMT-I", " SMT-II", "SMT-III", "THT生产线"]);
 const clickIndex = ref(0);
-const animate = ref(false)
+const animate = ref(false);
 const animationRun = (index: number) => {
   if (clickIndex.value == index) {
     animate.value = !animate.value;
   } else {
-    clickIndex.value = index
-    animate.value = true
+    clickIndex.value = index;
+    animate.value = true;
   }
   if (index == 4) {
-    isLine.value = animate.value ? true : false
+    isLine.value = animate.value ? true : false;
   } else {
-
   }
-}
+};
+onMounted(() => {
+  pageOnload(canvasBox.value as any);
+});
 </script>
 
 <style lang="less">

@@ -5,30 +5,48 @@ import { getDT_RobotProcessData } from "../request/second";
 import "@/2d/css/3d_index.css";
 
 export default class CreateScene {
-  container!: any;
-  PRO_ENV: string;
+  container!: any
+  PRO_ENV: string
   options: any;
-  clickIndex!: number;
-  mouseCartoon!: Array<any>;
+  clickIndex!: number
+  mouseCartoon!: Array<any>
   clock: any;
-  pointVector3!: any;
-  lookVector3!: any;
-  changeList: Array<any> = [];
+  pointVector3!: any
+  lookVector3!: any
+  changeList: Array<any> = []
+  objLineArr: Array<any> = []
+  smtCartoonList: Array<any> = []
+  meshList: Array<any> = []
+  lineIndex: number = 0
+  currentCartoon: Array<any> = []
+  cartoonStatus: boolean = false
+  agvCartoon: Array<any> = []
+  agvCartoonList1: Array<any> = []
+  textru!: any
+  lightFlashingList!: Array<any>
+  ajaxData = [
+    { type: "上板机", lineID: 1, data: {} },
+    { type: "下板机", lineID: 1, data: {} },
+    { type: "回流焊", lineID: 1, data: {} },
+    { type: "上板机", lineID: 2, data: {} },
+    { type: "下板机", lineID: 2, data: {} },
+    { type: "回流焊", lineID: 2, data: {} },
+    { type: "上板机", lineID: 3, data: {} },
+    { type: "下板机", lineID: 3, data: {} },
+    { type: "回流焊", lineID: 3, data: {} },
+    { type: "上板机", lineID: 4, data: {} },
+    { type: "下板机", lineID: 4, data: {} },
+    { type: "THT", lineID: 4, data: {} },
+  ]
+  tipPopupState = 0
+  floor2_Cartoon: any = []
+  isPause = false
+
   constructor(url: string) {
     this.PRO_ENV = url;
     this.options = common_attribute;
     this.clock = new Bol3D.Clock();
 
-    // 输出坐标
-    (window as any).outCooroutCoordinate = () => {
-      if (this.container == undefined) return;
-      let points = this.container.orbitControls.target;
-      let camera = this.container.orbitCamera.position;
-      return [
-        [Math.round(points.x), Math.round(points.y), Math.round(points.z)],
-        [Math.round(camera.x), Math.round(camera.y), Math.round(camera.z)],
-      ];
-    };
   }
   sceneOnLoad(domElement: HTMLCanvasElement, callback?: Function) {
     let delScene = new Date().getTime();
@@ -285,7 +303,7 @@ export default class CreateScene {
                 this.options.liug2 = chlid;
                 chlid.castShadow = false;
                 // chlid.receiveShadow = false;
-                this.options.container.addBloom(chlid);
+                this.container.addBloom(chlid);
                 this.setCityMaterial(chlid);
 
                 // 内场景地面
@@ -485,17 +503,17 @@ export default class CreateScene {
               if (res) this.options.robitData2 = res.data;
             });
           }, 10000);
-          tipPopup();
+          this.tipPopup();
           // 3楼灯
-          lampStatusChange("all");
-          liuGuang();
-          let tempArr = [];
+          this.lampStatusChange("all");
+          this.liuGuang();
+          let tempArr: any = [];
           this.container.clickObjects.forEach((chlid: any) => {
             if (chlid.name != "gx") tempArr.push(chlid);
           });
           this.container.sky.name = "SKY";
           this.options.clickObjetcArr = [
-            ...this.options.tempArr,
+            tempArr,
             this.container.sky,
           ];
           this.container.clickObjects = [...this.options.clickObjetcArr];
@@ -589,10 +607,15 @@ export default class CreateScene {
           });
           this.options.mainFloor.userData.parentName =
             this.options.mainBuilding.name;
-          addCanvas();
-          addIconCard();
-          sendMqTT();
+          this.addCanvas();
+          this.addIconCard();
+          this.sendMqTT();
           this.render();
+          const animation = () => {
+            requestAnimationFrame(animation)
+            this.render()
+          }
+          animation()
           console.log("is done");
           callback && callback();
         },
@@ -684,11 +707,11 @@ export default class CreateScene {
       e.objects[0].point.y.toFixed(2);
       console.log(
         "中心点： " +
-          e.objects[0].point.x.toFixed(2) +
-          "," +
-          e.objects[0].point.y.toFixed(2) +
-          "," +
-          e.objects[0].point.z.toFixed(2)
+        e.objects[0].point.x.toFixed(2) +
+        "," +
+        e.objects[0].point.y.toFixed(2) +
+        "," +
+        e.objects[0].point.z.toFixed(2)
       );
       console.log(e.objects[0].object);
     };
@@ -704,24 +727,24 @@ export default class CreateScene {
         !listtemp.includes(object.userData.type)
       ) {
         this.options.popupObj.scale.set(0.1, 0.1, 0.1);
-        equitPopup(true, object);
+        this.equitPopup(true, object);
         // 2楼自动线弹窗展示
       } else if (
         object.userData.parentName &&
         object.userData.parentName.includes("robit")
       ) {
         this.options.popupObj.scale.set(0.07, 0.07, 0.07);
-        this.options.textru.visible = false;
+        this.textru.visible = false;
         let key = object.userData.parentName == "robit1" ? 1 : 2;
-        robitPopup(true, key, object, point);
-        if (this.options.floor2_Cartoon.length > 0) {
-          this.options.floor2_Cartoon.forEach((chlid: any) => {
+        this.robitPopup(true, key, object, point);
+        if (this.floor2_Cartoon.length > 0) {
+          this.floor2_Cartoon.forEach((chlid: any) => {
             if (chlid) chlid.stop();
           });
-          this.options.isPause = false;
-          this.options.floor2_Cartoon = [];
-          this.options.currentCartoon = [];
-          this.options.cartoonStatus = false;
+          this.isPause = false;
+          this.floor2_Cartoon = [];
+          this.currentCartoon = [];
+          this.cartoonStatus = false;
         }
       } else {
         this.container.outlineObjects = [];
@@ -742,10 +765,19 @@ export default class CreateScene {
         router.push(routerList[object.userData.id - 1]);
       }
     };
+    // 输出坐标
+    (window as any).outCooroutCoordinate = () => {
+      if (this.container == undefined) return;
+      let points = this.container.orbitControls.target;
+      let camera = this.container.orbitCamera.position;
+      return [
+        [Math.round(points.x), Math.round(points.y), Math.round(points.z)],
+        [Math.round(camera.x), Math.round(camera.y), Math.round(camera.z)],
+      ];
+    };
   }
 
   render() {
-    requestAnimationFrame(this.render);
     //镜面 reflectRTT
     const delta = this.clock.getDelta();
     this.options.groundMirrorMaterial1 &&
@@ -760,41 +792,41 @@ export default class CreateScene {
     this.options.liug.material.map.offset.y += 0.01;
     this.options.liug1.material.map.offset.y += 0.01;
     this.options.liug2.material.map.offset.y += 0.005;
-    if (this.options.popupObj && this.options.textru) {
-      if (!this.options.popupObj.visible && this.options.textru.visible)
-        this.options.textru.visible = false;
+    if (this.options.popupObj && this.textru) {
+      if (!this.options.popupObj.visible && this.textru.visible)
+        this.textru.visible = false;
     }
     // 灯状态更改
-    this.options.ajaxData.forEach((chlid: any, index: number) => {
+    this.ajaxData.forEach((chlid: any, index: number) => {
       for (let i = 0; i < this.options.lampStatus.length; i++) {
         if (i == index) {
           let dataValue = Object.assign({}, chlid.data);
           let oldData = Object.assign({}, this.options.lampStatus[i].data);
           // 比较灯状态Change
-          if (!objDiffer(dataValue, oldData) && chlid.type != "THT") {
+          if (!this.objDiffer(dataValue, oldData) && chlid.type != "THT") {
             this.options.lampStatus[i].data = Object.assign({}, chlid.data);
             let lineID = chlid.lineID;
             let type = chlid.type;
             let temp = Object.assign({}, chlid.data);
             if (temp.red != oldData.red) {
               if (temp.red == 1) {
-                lampStatusChange("one", lineID, type, 3);
+                this.lampStatusChange("one", lineID, type, 3);
               } else {
-                lampStatusChange("one", lineID, type, 3, false, true);
+                this.lampStatusChange("one", lineID, type, 3, false, true);
               }
             }
             if (temp.green != oldData.green) {
               if (temp.green == 1) {
-                lampStatusChange("one", lineID, type, 4);
+                this.lampStatusChange("one", lineID, type, 4);
               } else {
-                lampStatusChange("one", lineID, type, 4, false, true);
+                this.lampStatusChange("one", lineID, type, 4, false, true);
               }
             }
             if (temp.yellow != oldData.yellow) {
               if (temp.yellow == 1) {
-                lampStatusChange("one", lineID, type, 1);
+                this.lampStatusChange("one", lineID, type, 1);
               } else {
-                lampStatusChange("one", lineID, type, 1, false, true);
+                this.lampStatusChange("one", lineID, type, 1, false, true);
               }
             }
           }
@@ -802,9 +834,9 @@ export default class CreateScene {
       }
     });
     // 提示弹窗浮动
-    if (this.options.tipPopupState == 0) {
-      this.options.tipPopupState = 1;
-      tipPopupMove();
+    if (this.tipPopupState == 0) {
+      this.tipPopupState = 1;
+      this.tipPopupMove();
     }
   }
 
@@ -1036,17 +1068,17 @@ export default class CreateScene {
       this.options.innerFloor2.material.opacity = 0.6;
     }
     let temp = arr[index - 1];
-    if (this.options.objLineArr.length > 0) {
-      smtBack(); // smt 状态恢复
+    if (this.objLineArr.length > 0) {
+      this.smtBack(); // smt 状态恢复
     }
-    this.options.currentCartoon = [];
-    this.options.cartoonStatus = false;
-    if (this.options.floor2_Cartoon.length > 0) {
-      this.options.floor2_Cartoon.forEach((chlid: any) => {
+    this.currentCartoon = [];
+    this.cartoonStatus = false;
+    if (this.floor2_Cartoon.length > 0) {
+      this.floor2_Cartoon.forEach((chlid: any) => {
         if (chlid) chlid.stop();
       });
-      this.options.floor2_Cartoon = [];
-      this.options.isPause = false;
+      this.floor2_Cartoon = [];
+      this.isPause = false;
     }
     let clickObject: Array<any> = [];
     temp.traverse((item: any) => {
@@ -1057,8 +1089,8 @@ export default class CreateScene {
         clickObject.push(...this.options.floor2_Icon_Click);
     });
     this.container.clickObjects = [...clickObject];
-    avgMove(false);
-    agvRandomMove(false);
+    this.avgMove(false);
+    this.agvRandomMove(false);
     this.options.AGV.position.set(...this.options.agvRouteList[index - 1][6]);
     this.options.AGV.rotation.y = this.options.agvAngleList[index - 1][6];
     this.options.AGV1.position.set(
@@ -1083,14 +1115,14 @@ export default class CreateScene {
     // 弹窗隐藏
     this.options.popupObj.visible = false;
     // 精灵材质隐藏
-    this.options.textru.visible = false;
+    this.textru.visible = false;
     let change1 = this.sceneMove(
       this.options.sceneAngle[index - 1][0],
       this.options.sceneAngle[index - 1][1],
       0,
       () => {
         this.container.sunLight.intensity = 0.5;
-        mouseLockToggle(true);
+        this.mouseLockToggle(true);
         if (index == 1) {
           this.options.LouCheng1.visible = true;
           this.options.LouCheng2.visible = false;
@@ -1152,8 +1184,8 @@ export default class CreateScene {
             this.options.innerFloor1.material.transparent = false;
             this.options.innerFloor2.material.opacity = 1;
             this.options.innerFloor2.material.transparent = false;
-            avgMove(true);
-            agvRandomMove(true, "ahead");
+            this.avgMove(true);
+            this.agvRandomMove(true, "ahead");
             this.changeList = [];
           });
         this.changeList.push(change2);
@@ -1161,4 +1193,1239 @@ export default class CreateScene {
     );
     this.changeList.push(...change1);
   }
+
+  // 返回主视角
+  bcakHome() {
+    this.options.floorIndex = 0;
+    if (this.changeList.length > 0) {
+      this.changeList.forEach((child) => child && child.stop());
+      this.changeList = [];
+    }
+    this.container.clickObjects = [...this.options.clickObjetcArr];
+    this.options.LouCheng1.visible = false;
+    this.options.LouCheng1.position.y = this.options.LouCheng1.userData.position.y;
+    this.options.LouCheng2.visible = false;
+    this.options.LouCheng2.position.y = this.options.LouCheng2.userData.position.y;
+    this.options.LouCheng3.visible = false;
+    this.options.LouCheng3.position.y = this.options.LouCheng3.userData.position.y;
+    this.options.innerFloor1.material.opacity = 1;
+    this.options.innerFloor1.material.transparent = false;
+    this.options.innerFloor2.material.opacity = 1;
+    this.options.innerFloor2.material.transparent = false;
+    this.options.innerFloor3.material.opacity = 1;
+    this.options.AGV.visible = false;
+    this.options.AGV1.visible = false;
+    this.options.MirrorMaterial2.visible = false;
+    // 弹窗隐藏
+    this.options.popupObj.visible = false;
+    // 精灵材质隐藏
+    this.textru.visible = false;
+    this.smtBack(); // smt 状态恢复
+    this.currentCartoon = [];
+    this.cartoonStatus = false;
+    if (this.floor2_Cartoon.length > 0) {
+      this.floor2_Cartoon.forEach((chlid: any) => {
+        if (chlid) chlid.stop();
+      });
+      this.floor2_Cartoon = [];
+      this.isPause = false;
+    }
+    this.avgMove(false);
+    this.agvRandomMove(false);
+    this.options.StaffList.forEach((chlid: any) => {
+      chlid.visible = false;
+    });
+    let list = [...this.options.floorOtherMesh_1, ...this.options.floorOtherMesh_2, ...this.options.floorOtherMesh_3];
+    list.forEach((chlid) => (chlid.visible = false));
+    this.options.mainBuilding.visible = true;
+    this.options.liug2.visible = true;
+    this.container.mixerActions.forEach((child: any) => {
+      child.paused = true;
+      child.time = 0;
+    });
+    this.container.outlineObjects = [];
+    this.mouseLockToggle(true);
+    this.options.tipPOpupList.forEach((child: any) => (child.visible = false));
+    this.sceneMove([571, 20, 94], [1761, 954, -1987], 0, () => {
+      this.options.LineTimeList.forEach((chlid: any) => (chlid.visible = false));
+      this.container.sunLight.intensity = 2.5;
+      this.options.waibu1.visible = true;
+      this.options.waibu2.visible = true;
+      this.options.MirrorMaterial1.visible = true;
+    });
+  };
+  Smt_Function(index: number, fun?: Function) {
+    if (index < 0 || index > 3) return;
+    if (this.lineIndex == index) {
+      this.smt_Pause();
+      return;
+    }
+    this.lineIndex = index;
+    let sceneAngleList: any;
+    let animation: any;
+    this.container.mixerActions.forEach((child: any) => {
+      if (child._clip.name == "3l-dh") animation = child;
+    });
+    animation.time = 0;
+    animation.paused = false;
+    // 补间动画停止
+    if (this.smtCartoonList.length > 0) {
+      this.smtCartoonList.forEach((chlid) => {
+        chlid && chlid.stop();
+      });
+    }
+    // 上一次mesh透明度恢复
+    if (this.meshList.length > 0) {
+      this.meshList.forEach((chlid) => {
+        chlid.material.opacity = chlid.userData.opacity;
+        if (chlid.name.includes("QuanZhiDongK_X")) chlid.visible = true;
+        if (chlid.name.includes("TuBiao")) chlid.visible = false;
+      });
+    }
+    // 暂停功能恢复
+    if (this.cartoonStatus) {
+      this.currentCartoon = [];
+      this.cartoonStatus = false;
+    }
+    if (index == 1) {
+      sceneAngleList = [
+        { point: [-57, 20, -106], look: [-301, 280, 130], time: 2000 },
+        { point: [-101, 20, -200], look: [36, 106, -82], time: 5000 },
+        { point: [-101, 20, -200], look: [36, 106, -82], time: 4000 },
+        { point: [-108, 20, -166], look: [-11, 109, -86], time: 4000 },
+        { point: [-108, 20, -166], look: [-11, 109, -86], time: 2000 },
+        { point: [-183, 20, -209], look: [-126, 147, -53], time: 3000 },
+        { point: [-183, 20, -209], look: [-126, 147, -53], time: 4000 },
+        { point: [-65, 20, -177], look: [-69, 200, -12], time: 3000 },
+        { point: [-101, 20, -200], look: [36, 106, -82], time: 3000 },
+        { point: [-101, 20, -200], look: [36, 106, -82], time: 4000 },
+        { point: [-183, 20, -209], look: [-126, 147, -53], time: 5000 },
+        { point: [-183, 20, -209], look: [-126, 147, -53], time: 3000 },
+        { point: [-65, 20, -177], look: [-69, 200, -12], time: 2000 },
+      ];
+    } else if (index == 2) {
+      sceneAngleList = [
+        { point: [-57, 20, -106], look: [-301, 280, 130], time: 2000 },
+        { point: [-63, 20, -144], look: [25, 120, -10], time: 5000 },
+        { point: [-63, 20, -144], look: [25, 120, -10], time: 5000 },
+        { point: [-74, 20, -136], look: [-8, 110, -18], time: 4000 },
+        { point: [-74, 20, -136], look: [-8, 110, -18], time: 2000 },
+        { point: [-189, 20, -135], look: [-123, 110, -16], time: 3000 },
+        { point: [-189, 20, -135], look: [-123, 110, -16], time: 4000 },
+        { point: [-77, 20, -181], look: [-76, 171, 63], time: 3000 },
+        { point: [-63, 20, -144], look: [25, 120, -10], time: 3000 },
+        { point: [-63, 20, -144], look: [25, 120, -10], time: 3000 },
+        { point: [-189, 20, -135], look: [-123, 110, -16], time: 5000 },
+        { point: [-189, 20, -135], look: [-123, 110, -16], time: 3000 },
+        { point: [-77, 20, -181], look: [-76, 171, 63], time: 2000 },
+      ];
+    } else if (index == 3) {
+      sceneAngleList = [
+        { point: [-57, 20, -106], look: [-301, 280, 130], time: 2000 },
+        { point: [-69, 20, -124], look: [15, 124, 53], time: 5000 },
+        { point: [-69, 20, -124], look: [15, 124, 53], time: 5000 },
+        { point: [-96, 20, -122], look: [-24, 109, 30], time: 4000 },
+        { point: [-96, 20, -122], look: [-24, 109, 30], time: 2000 },
+        { point: [-189, 20, -117], look: [-117, 129, 48], time: 3000 },
+        { point: [-189, 20, -117], look: [-117, 129, 48], time: 4000 },
+        { point: [-63, 20, -98], look: [-65, 168, 82], time: 3000 },
+        { point: [-69, 20, -124], look: [15, 124, 53], time: 3000 },
+        { point: [-69, 20, -124], look: [15, 124, 53], time: 3000 },
+        { point: [-189, 20, -117], look: [-117, 129, 48], time: 5000 },
+        { point: [-189, 20, -117], look: [-117, 129, 48], time: 3000 },
+        { point: [-63, 20, -98], look: [-65, 168, 82], time: 2000 },
+      ];
+    }
+    let sceneCartoon: any = this.sceneChange(sceneAngleList);
+    this.smtCartoonList = [...sceneCartoon[0], ...sceneCartoon[1]];
+    let lineList = [this.options.Smt1, this.options.Smt2, this.options.Smt3];
+    let line = lineList[index - 1]; // 产线对应obj
+    if (this.objLineArr.length < 1) {
+      for (let smt of lineList) {
+        smt.traverse((item: any) => {
+          if (item.isMesh) {
+            const edges = new Bol3D.EdgesGeometry(item.geometry);
+            const linelineSegment = new Bol3D.LineSegments(
+              edges,
+              new Bol3D.LineBasicMaterial({ color: "#0dd8fd" })
+            );
+            item.add(linelineSegment);
+            linelineSegment.name = smt.name;
+            (linelineSegment as any).userData.type = "line";
+            this.objLineArr.push(linelineSegment);
+          }
+        });
+      }
+    } else if (this.options.objLineArr.length === 265) {
+      this.objLineArr.forEach((chlid: any) => {
+        chlid.visible = true;
+      });
+    }
+    // 视角切换
+    for (let i = 0; i < sceneCartoon[0].length - 1; i++) {
+      sceneCartoon[0][i].chain(sceneCartoon[0][i + 1]);
+      sceneCartoon[1][i].chain(sceneCartoon[1][i + 1]);
+    }
+    this.mouseLockToggle(false);
+    sceneCartoon[0][0].start();
+    sceneCartoon[1][0].start();
+    let offsetList = [
+      [-10, 2, -20],
+      [0, 2, 0],
+      [-10, 2, -20],
+      [0, 2, 0],
+      [-10, 2, -20],
+      [0, 2, 0],
+    ];
+
+    sceneCartoon[0][1].onComplete(() => {
+      this.objLineArr.forEach((chlid: any) => {
+        chlid.visible = false;
+      });
+      let objIndex = (index - 1) * 2;
+      this.equitPopup(false, this.options.floor3PopupBrowse[objIndex].obj, offsetList[objIndex]);
+    });
+    sceneCartoon[0][3].onComplete(() => {
+      this.options.popupObj.visible = false;
+      this.options.jiqiTopArr.forEach((chlid: any) => {
+        if (chlid.userData.id == index) chlid.visible = false;
+      });
+      this.options.cardArr.forEach((chlid: any) => {
+        if (chlid.userData.id == index) chlid.visible = true;
+      });
+    });
+    sceneCartoon[0][4].onComplete(() => {
+      this.options.jiqiTopArr.forEach((chlid: any) => {
+        if (chlid.userData.id == index) chlid.visible = true;
+      });
+      this.options.cardArr.forEach((chlid: any) => {
+        if (chlid.userData.id == index) chlid.visible = false;
+      });
+    });
+    sceneCartoon[0][5].onComplete(() => {
+      let objIndex = (index - 1) * 2 + 1;
+      this.equitPopup(false, this.options.floor3PopupBrowse[objIndex].obj, offsetList[objIndex]);
+      // 产线对应灯隐藏
+      this.options.lampList.forEach((chlid: any) => {
+        if (chlid.userData.lineID === index) chlid.visible = false;
+      });
+      this.objLineArr.forEach((chlid: any) => {
+        chlid.visible = true;
+      });
+      line.traverse((chlid: any) => {
+        if (chlid.isMesh && chlid.userData.type != "line") {
+          chlid.material.transparent = true;
+          let transparentChange = new Bol3D.TWEEN.Tween(chlid.material)
+            .to({ opacity: 0.05 }, 3000)
+            .start();
+          this.smtCartoonList.push(transparentChange);
+          this.meshList.push(chlid);
+        }
+      });
+    });
+    sceneCartoon[1][7].onStart(() => {
+      this.options.popupObj.visible = false;
+    });
+    sceneCartoon[1][8].onComplete(() => {
+      let objIndex = (index - 1) * 2;
+      this.equitPopup(false, this.options.floor3PopupBrowse[objIndex].obj, offsetList[objIndex]);
+    });
+    sceneCartoon[1][10].onComplete(() => {
+      let objIndex = (index - 1) * 2 + 1;
+      this.equitPopup(false, this.options.floor3PopupBrowse[objIndex].obj, offsetList[objIndex]);
+    });
+    sceneCartoon[1][11].onComplete(() => {
+      this.options.popupObj.visible = false;
+    });
+
+    sceneCartoon[1][12].onComplete(() => {
+      // 产线对应灯显示
+      this.options.lampList.forEach((chlid: any) => {
+        if (chlid.userData.lineID === index) chlid.visible = true;
+      });
+      line.traverse((chlid: any) => {
+        if (chlid.isMesh && chlid.userData.type != "line") {
+          let transparentChange = new Bol3D.TWEEN.Tween(chlid.material)
+            .to({ opacity: chlid.userData.opacity }, 3000)
+            .start();
+          this.smtCartoonList.push(transparentChange);
+        }
+      });
+      this.objLineArr.forEach((chlid: any) => {
+        chlid.visible = false;
+      });
+      animation.paused = true;
+      animation.time = 0;
+      this.smtCartoonList = [];
+      this.meshList = [];
+      this.lineIndex = 0;
+      this.mouseLockToggle(true);
+      fun && fun();
+    });
+  };
+  // smt 状态恢复
+  smtBack(fun?: Function) {
+    // 补间动画停止
+    if (this.smtCartoonList.length > 0) {
+      this.smtCartoonList.forEach((chlid) => {
+        chlid && chlid.stop();
+      });
+      this.smtCartoonList = [];
+    }
+    // 上一次mesh透明度恢复
+    if (this.meshList.length > 0) {
+      this.meshList.forEach((chlid) => {
+        chlid.material.opacity = chlid.userData.opacity;
+        if (chlid.name.includes("QuanZhiDongK_X")) chlid.visible = true;
+        if (chlid.name.includes("TuBiao")) chlid.visible = false;
+      });
+      this.meshList = [];
+    }
+    // 边框线隐藏
+    if (this.objLineArr.length > 0) {
+      this.objLineArr.forEach((chlid: any) => {
+        chlid.visible = false;
+      });
+    }
+    // 动画停止
+    this.container.mixerActions[1].paused = true;
+    this.container.mixerActions[1].time = 0;
+    // 暂停功能恢复
+    if (this.cartoonStatus) {
+      this.currentCartoon = [];
+      this.cartoonStatus = false;
+      this.lineIndex = 0;
+    }
+    //灯显示
+    this.options.lampList.forEach((chlid: any) => {
+      chlid.visible = true;
+    });
+    fun && fun();
+  }
+
+  smt_Pause() {
+    let list = this.options.floorIndex == 3 ? this.smtCartoonList : this.floor2_Cartoon;
+    if (list.length < 1) return;
+    if (this.cartoonStatus) {
+      if (this.currentCartoon.length > 0) {
+        this.currentCartoon.forEach((chlid) => {
+          chlid.resume();
+        });
+        this.currentCartoon = [];
+        this.cartoonStatus = false;
+        if (this.options.floorIndex == 3) this.container.mixerActions[1].paused = false;
+        this.mouseLockToggle(false);
+      }
+      return;
+    }
+    list.forEach((chlid: any) => {
+      if (chlid.isPlaying()) {
+        chlid.pause();
+        this.currentCartoon.push(chlid);
+        this.cartoonStatus = true;
+        this.mouseLockToggle(true);
+      }
+    });
+    if (this.options.floorIndex == 3) this.container.mixerActions[1].paused = true;
+  }
+  avgMove(agvState: boolean) {
+    if (!agvState) {
+      if (this.agvCartoon.length > 1) {
+        this.agvCartoon.forEach((chlid) => {
+          chlid && chlid.stop();
+        });
+        if (this.options.floorIndex != 0) {
+          this.options.AGV.position.set(...this.options.agvRouteList[this.options.floorIndex - 1][6]);
+          this.options.AGV.rotation.y = this.options.agvAngleList[this.options.floorIndex - 1][6];
+        } else {
+          this.options.AGV.position.set(...this.options.agvRouteList[2][6]);
+          this.options.AGV.rotation.y = this.options.agvAngleList[2][6];
+        }
+      }
+      return;
+    }
+    if (this.options.floorIndex === 0) return;
+    let agvAction: any = this.agvChange(
+      this.options.agvRouteList[this.options.floorIndex - 1],
+      this.options.agvAngleList[this.options.floorIndex - 1]
+    );
+    for (let i = 0; i < this.options.agvRouteList[this.options.floorIndex - 1].length; i++) {
+      agvAction[0][i].chain(agvAction[1][i]);
+      if (i < this.options.agvRouteList[this.options.floorIndex - 1].length - 1)
+        agvAction[1][i].chain(agvAction[0][i + 1]);
+    }
+    this.agvCartoon = [...agvAction[0], ...agvAction[1]];
+    agvAction[0][0].start();
+    agvAction[1][this.options.agvRouteList[this.options.floorIndex - 1].length - 1].onComplete(
+      () => {
+        this.avgMove(true);
+      }
+    )
+  }
+  agvRandomMove(state: boolean, forword?: string) {
+    if (state) {
+      let angleTemp: number;
+      if (forword == "ahead") {
+        if (this.options.floorIndex === 1) angleTemp = Math.PI;
+        if (this.options.floorIndex === 2) angleTemp = Math.PI / 2;
+        if (this.options.floorIndex === 3) angleTemp = Math.PI / 2;
+      } else if (forword == "back") {
+        if (this.options.floorIndex === 1) angleTemp = 0;
+        if (this.options.floorIndex === 2) angleTemp = -Math.PI / 2;
+        if (this.options.floorIndex === 3) angleTemp = -Math.PI / 2;
+      }
+      this.options.agvRouteList1[this.options.floorIndex - 1].forEach((chlid: any, index: number) => {
+        if (index > 0 && index < 4) chlid.angle = angleTemp;
+      });
+      let cartoon: any = this.agvChange2(this.options.agvRouteList1[this.options.floorIndex - 1], forword as any);
+      this.agvCartoonList1 = [...cartoon.flat()];
+      for (let i = 0; i < this.options.agvRouteList1[this.options.floorIndex - 1].length - 1; i++) {
+        cartoon[0][i].chain(cartoon[1][i]);
+        if (cartoon[0][i + 1]) cartoon[1][i].chain(cartoon[0][i + 1]);
+      }
+      cartoon[0][0].start();
+      // 随机巡检
+      [0, 1, 2].forEach((index) => {
+        cartoon[1][index].onStart(() => {
+          let randomNum = Math.ceil(Math.random() * 5);
+          if (randomNum === 5) {
+            cartoon[1][index].pause();
+            let obj;
+            let pos;
+            if (forword == "ahead") {
+              obj = this.options.agvRouteList1_random[this.options.floorIndex - 1][index];
+              pos = this.options.agvRouteList1[this.options.floorIndex - 1][index + 1].point;
+            }
+            if (forword == "back") {
+              if (index == 0) {
+                obj = this.options.agvRouteList1_random[this.options.floorIndex - 1][2];
+                pos = this.options.agvRouteList1[this.options.floorIndex - 1][3].point;
+              } else if (index == 1) {
+                obj = this.options.agvRouteList1_random[this.options.floorIndex - 1][index];
+                pos = this.options.agvRouteList1[this.options.floorIndex - 1][2].point;
+              } else if (index == 2) {
+                obj = this.options.agvRouteList1_random[this.options.floorIndex - 1][0];
+                pos = this.options.agvRouteList1[this.options.floorIndex - 1][1].point;
+              }
+            }
+            let randomCartoon: any = this.agvRandomChange(obj, pos);
+            this.agvCartoonList1.push(...randomCartoon);
+            for (let i = 0; i < randomCartoon.length - 1; i++) {
+              randomCartoon[i].chain(randomCartoon[i + 1]);
+            }
+            randomCartoon[0].start();
+            randomCartoon[randomCartoon.length - 1].onComplete(function () {
+              cartoon[1][index].resume();
+            });
+          }
+        });
+      });
+      cartoon[1][cartoon[1].length - 1].onComplete(() => {
+        if (forword == "ahead") {
+          forword = "back";
+        } else {
+          forword = "ahead";
+        }
+        this.agvCartoonList1 = [];
+        this.agvRandomMove(true, forword);
+      });
+      // false 退出动画
+    } else {
+      if (this.agvCartoonList1.length < 1) return;
+      this.agvCartoonList1.forEach((chlid) => {
+        chlid && chlid.stop();
+      });
+      this.agvCartoonList1 = [];
+      if (this.options.floorIndex != 0) {
+        this.options.AGV1.position.set(...this.options.agvRouteList1[this.options.floorIndex - 1][0].point);
+        this.options.AGV1.rotation.y = this.options.agvRouteList1[this.options.floorIndex - 1][0].angle;
+      } else {
+        this.options.AGV1.position.set(...this.options.agvRouteList1[2][0].point);
+        this.options.AGV1.rotation.y = Math.PI / 2;
+      }
+    }
+  }
+  agvChange(routeList: Array<any>, angleList: Array<any>) {
+    if (!routeList || !angleList) return;
+    let temp = [];
+    let temp1 = [];
+    for (let i = 0; i < routeList.length; i++) {
+      let pos = i == 0 ? routeList[routeList.length - 1] : routeList[i - 1];
+      let position1 = new Bol3D.Vector3(...routeList[i]);
+      let position2 = new Bol3D.Vector3(...pos);
+      let time = Math.abs(position2.distanceTo(position1));
+      temp[i] = new Bol3D.TWEEN.Tween(this.options.AGV).to(
+        {
+          position: new Bol3D.Vector3(...routeList[i]),
+        },
+        time * 30
+      );
+      temp1[i] = new Bol3D.TWEEN.Tween(this.options.AGV.rotation).to({ y: angleList[i] }, 500);
+    }
+    return [temp, temp1];
+  }
+  agvChange2(list: Array<any>, forword: string) {
+    if (!list || !forword) return;
+    let temp: Array<any> = [];
+    let temp1: Array<any> = [];
+    if (forword == "ahead") {
+      for (let i = 1; i < list.length; i++) {
+        let pos1 = new Bol3D.Vector3(...list[i - 1].point);
+        let pos2 = new Bol3D.Vector3(...list[i].point);
+        let time = Math.abs(pos1.distanceTo(pos2));
+        temp[i - 1] = new Bol3D.TWEEN.Tween(this.options.AGV1).to(
+          { position: pos2 },
+          time * 30
+        );
+        temp1[i - 1] = new Bol3D.TWEEN.Tween(this.options.AGV1.rotation).to(
+          { y: list[i].angle },
+          200
+        );
+      }
+    } else if (forword == "back") {
+      for (let i = list.length - 2; i >= 0; i--) {
+        let pos1 = new Bol3D.Vector3(...list[i + 1].point);
+        let pos2 = new Bol3D.Vector3(...list[i].point);
+        let time = Math.abs(pos1.distanceTo(pos2));
+        let num = 0;
+        if (i == 3) {
+          num = 0;
+        } else if (i == 2) {
+          num = 1;
+        } else if (i == 1) {
+          num = 2;
+        } else if (i == 0) {
+          num = 3;
+        }
+        temp[num] = new Bol3D.TWEEN.Tween(this.options.AGV1).to({ position: pos2 }, time * 30);
+        temp1[num] = new Bol3D.TWEEN.Tween(this.options.AGV1.rotation).to(
+          { y: list[i].angle },
+          200
+        );
+      }
+    }
+    return [temp, temp1];
+  }
+  agvRandomChange(obj: any, pos: Array<number>) {
+    if (!obj || !pos) return;
+    let temp = [];
+    let pos1 = new Bol3D.Vector3(...pos);
+    let pos2 = new Bol3D.Vector3(...obj.point);
+    let time = Math.abs(pos1.distanceTo(pos2));
+    let angle1, angle2;
+    if (this.options.floorIndex === 1) {
+      angle1 = Math.PI / 2;
+      angle2 = -Math.PI / 2;
+    } else if (this.options.floorIndex === 2) {
+      angle1 = Math.PI;
+      angle2 = 0;
+    } else if (this.options.floorIndex === 3) {
+      angle1 = 0;
+      angle2 = Math.PI;
+    }
+    temp[0] = new Bol3D.TWEEN.Tween(this.options.AGV1.rotation).to({ y: angle1 }, 200);
+    temp[1] = new Bol3D.TWEEN.Tween(this.options.AGV1).to({ position: pos2 }, time * 30);
+    temp[2] = new Bol3D.TWEEN.Tween(this.options.AGV1.rotation).to({ y: angle2 }, 200);
+    temp[3] = new Bol3D.TWEEN.Tween(this.options.AGV1).to({ position: pos1 }, time * 30);
+    return temp;
+  }
+
+  addCanvas() {
+    let canvas = document.createElement("canvas");
+    canvas.width = 241;
+    canvas.height = 187;
+    let c: any = canvas.getContext("2d");
+    // 矩形区域填充背景
+    c.fillStyle = "rgba(255, 255, 255, 0)";
+    c.fillRect(0, 0, 241, 187);
+    c.beginPath();
+    // 文字
+
+    let img = new Image();
+    img.src = this.PRO_ENV + "3d/textures/p1.png";
+    img.onload = () => {
+      c.drawImage(this, 0, 0, 241, 187);
+      c.fillStyle = "#0fefe2"; //文本填充颜色
+      c.font = "bold 15px 微软雅⿊"; //字体样式设置
+      c.textBaseline = "top"; //文本与fillText定义的纵坐标            top hanging middle  ideographic bottom
+      c.textAlign = "left"; //文本居中(以fillText定义的横坐标)        start  end  center  left   right
+      c.fillText("回流焊", 98, 35);
+
+      let texture = new Bol3D.CanvasTexture(canvas);
+      texture.needsUpdate = true;
+      let material = new Bol3D.SpriteMaterial({ map: texture });
+      this.textru = new Bol3D.Sprite(material);
+
+      this.textru.scale.set(20, 15, 1);
+      this.textru.renderOrder = 500;
+      this.container.attach(this.textru);
+      this.textru.center.y = 0;
+      this.textru.position.set(-108, 90, -9);
+      // container.addBloom(this.textru);
+      this.textru.visible = false;
+    };
+  }
+  // 修改title弹窗map
+  changeSpriteMap(type: boolean, title: string, offset: Array<number>, newPosition: Array<number>) {
+    this.textru.visible = false;
+    let path: string;
+    if (type) {
+      path = "3d/textures/p1.png";
+    } else {
+      path = "3d/textures/p2.png";
+    }
+    // 定义cavas
+    let canvas = document.createElement("canvas");
+    canvas.width = 241;
+    canvas.height = 187;
+    let c: any = canvas.getContext("2d");
+    // 矩形区域填充背景
+    c.fillStyle = "rgba(255, 255, 255, 0)";
+    c.fillRect(0, 0, 241, 187);
+    c.beginPath();
+    let img = new Image();
+    img.src = this.PRO_ENV + path;
+    img.onload = () => {
+      c.drawImage(this, 0, 0, 241, 187);
+      let len = title.length;
+      let offset_x = (241 - len * 15) / 2;
+      if (type) {
+        c.fillStyle = "#0fefe2"; //文本填充颜色
+        c.font = "bold 15px 微软雅⿊"; //字体样式设置
+        c.textBaseline = "top"; //文本与fillText定义的纵坐标            top hanging middle  ideographic bottom
+        c.textAlign = "left"; //文本居中(以fillText定义的横坐标)        start  end  center  left   right
+        c.fillText(`${title}`, offset_x, offset[1]);
+      } else {
+        c.drawImage(this, 0, 0, 241, 187);
+        c.fillStyle = "#E7000A"; //文本填充颜色
+        c.font = "bold 15px 微软雅⿊"; //字体样式设置
+        c.textBaseline = "top"; //文本与fillText定义的纵坐标            top hanging middle  ideographic bottom
+        c.textAlign = "left"; //文本居中(以fillText定义的横坐标)        start  end  center  left   right
+        c.fillText(`${title}`, offset_x, offset[1]);
+      }
+      let texture = new Bol3D.CanvasTexture(canvas);
+      texture.needsUpdate = true;
+      this.textru.material.map = texture;
+      this.textru.position.set(...newPosition);
+      this.textru.visible = true;
+    };
+  }
+
+  // 设备加弹窗
+  addIconCard() {
+    let iconInformation = new Bol3D.POI.Popup3D({
+      value: `<div class='popupInformation' id></div>`,
+      position: [100, 300, 0],
+      className: "externalBox",
+      closeVisible: "visible",
+      scale: [0.2, 0.2, 0.2],
+    });
+    iconInformation.visible = false;
+    this.container.attach(iconInformation);
+    this.container.addBloom(iconInformation);
+    this.options.popupObj = iconInformation;
+  };
+  // 改变弹窗样式、内容
+  popupChange(type: string, name: string, data: any, fun?: Function) {
+    if (!type) return;
+    if (!data || data.length < 1) type = "none";
+    this.options.popupObj.visible = false;
+    let dom: any = document.querySelector(".popupInformation");
+    dom.style.backgroundColor = "";
+    if (type == "normal") {
+      dom.style.backgroundImage = `url(${this.PRO_ENV}3d/textures/弹窗绿.png)`;
+      let titleName = name;
+      // let schedule = 5.68; // 生产进度
+      // let equitID = "0591";
+      // let equitStatus = "运行";
+      // let equitTemperature = 40;
+      // let equitNG = 12;
+      // let equitNG_rate = 3.16;
+      let count = data.count;
+      let red = data.red ? "亮" : "不亮";
+      let green = data.green ? "亮" : "不亮";
+      let yellow = data.yellow ? "亮" : "不亮";
+      // dom.innerHTML = `<div class='titleName'>${titleName}</div>
+      // <div class='iconAndContent'><div class='contentTitle'>生产进度</div><div class='schedule'>${schedule}%</div>
+      // <div class='bar'><div class='barChlid' style='width:${
+      //   (schedule * 188) / 100
+      // }px'></div></div></div><div class='contentBox'>
+      // <div class='equitID'>设备编号：${equitID}</div><div class='equitStatus'>设备状态：${equitStatus}</div><div class='equitTemperature'>设备温度：${equitTemperature}℃</div>
+      // <div class='equitNG'>不良品：${equitNG}</div><div class='equitNG_rate'>不良品：${equitNG_rate}%</div></div>`;
+      dom.innerHTML = `<div class='titleName'>${titleName}</div>
+    <div class='contentBox'>
+    <div class='equitID'>产量：${count}</div>
+    <div class='red'>红灯：${red}</div>
+    <div class='green'>黄灯：${yellow}</div>
+    <div class='yellow'>绿灯：${green}</div></div>
+    `;
+    } else if (type == "warn") {
+      dom.style.backgroundImage = `url(${this.PRO_ENV}3d/textures/弹窗红.png)`;
+      let titleName = name;
+      let equitID = "0168";
+      let equitStatus = "故障";
+      let reason = "温度过高";
+      dom.innerHTML = `<div class='titleName' style='color:#E7000A'>${titleName}</div>
+    <div class='warnBox'><div class='warn'></div></div>
+    <div class='contentBox' style='top:168px;height:57px'><div class='equitID'>设备编号：${equitID}</div><div class='equitStatus'>设备状态：${equitStatus}</div>
+    <div class='reason'>故障原因：${reason}</div> </div>`;
+    } else if (type == "robit") {
+      dom.style.backgroundImage = `url(${this.PRO_ENV}3d/textures/弹窗绿.png)`;
+      let titleName = name;
+      let batchIdex = data["fbatchNo"];
+      let equitID = data["fserialNo"];
+      let Station = data["fworkSection"];
+
+      dom.innerHTML = `<div class='titleName' >${titleName}</div>
+    <div class='contentBox' style='top:110px;height:57px;font-size:15px'><div class='batchIdex'>当前批次号：${batchIdex}</div><div class='equitID'>产品ID：${equitID}</div>
+    <div class='Station'>工位：${Station}</div> </div>
+    `;
+    } else if (type == "none") {
+      dom.style.backgroundImage = `url(${this.PRO_ENV}3d/textures/弹窗绿.png)`;
+      let titleName = name;
+      dom.innerHTML = `
+    <div class='titleName' >${titleName}</div>
+    <div class='contentBox' style='top:110px;height:57px;font-size:25px'>暂无数据！
+     </div>
+    `;
+    }
+    fun && fun();
+    this.options.popupObj.visible = true;
+  }
+
+  // 灯状态更新
+  lampStatusChange(
+    type: string,
+    lineId?: number,
+    equitType?: string,
+    colorNum?: number,
+    flashing?: boolean,
+    close?: boolean
+  ) {
+    if (!type) return;
+    if (type == "all") {
+      this.options.lampList.forEach((chlid: any) => {
+        chlid.children.forEach((chi: any) => {
+          if (chi.name.substring(chi.name.length - 1) == 4) {
+            // 1:黄灯 3：红灯 4：绿灯
+            chi.material.lightMap = new Bol3D.TextureLoader().load(
+              this.PRO_ENV + "3d/ffff(1).png"
+            );
+            chi.material.envMap = null;
+            chi.material.lightMapIntensity = 15;
+            this.container.addBloom(chi);
+          } else {
+            this.container.removeBloom(chi);
+            chi.material.lightMapIntensity = -3;
+          }
+        });
+      });
+    } else if (type == "one") {
+      if (!lineId || !equitType || !colorNum) return;
+
+      this.options.lampList.forEach((chlid: any) => {
+        if (
+          chlid.userData.type &&
+          chlid.userData.type == equitType &&
+          chlid.userData.lineID == lineId
+        ) {
+          chlid.children.forEach((chi: any) => {
+            if (chi.name.substring(chi.name.length - 1) == colorNum) {
+              this.lightFlashing(chi, false);
+              chi.material.lightMap = new Bol3D.TextureLoader().load(
+                this.PRO_ENV + "3d/ffff(1).png"
+              );
+
+              if (!close) {
+                // 灯正常亮
+                if (!flashing) {
+                  chi.material.lightMapIntensity = 15;
+                  this.container.addBloom(chi);
+                  // 灯闪烁
+                } else {
+                  this.lightFlashing(chi, true);
+                }
+                // 灯关闭
+              } else {
+                chi.material.lightMap = null;
+                chi.material.lightMapIntensity = -3;
+                this.container.removeBloom(chi);
+              }
+            }
+          });
+        }
+      });
+    }
+  }
+
+  lightFlashing(obj: any, type: boolean) {
+    // type: true时闪烁，false关闭闪烁
+    if (!obj) return;
+    if (type) {
+      let lighting = new Bol3D.TWEEN.Tween(obj.material).to(
+        { lightMapIntensity: 15 },
+        500
+      );
+
+      let closeing = new Bol3D.TWEEN.Tween(obj.material).to(
+        { lightMapIntensity: -3 },
+        500
+      );
+      let temp = [];
+      if (obj.material.lightMapIntensity > 14.5) {
+        closeing.chain(lighting);
+        closeing.start();
+        temp = [closeing, lighting];
+      } else {
+        lighting.chain(closeing);
+        lighting.start();
+        temp = [closeing, lighting];
+      }
+      this.lightFlashingList.push({
+        name: obj.userData.type + obj.userData.lineID + `-${obj.userData.color}`,
+        cartoon: [lighting, closeing],
+      });
+      temp[1].onComplete(() => {
+        this.lightFlashing(obj, true);
+      });
+    } else {
+      let status = false;
+      this.lightFlashingList.forEach((chlid, index) => {
+        if (
+          chlid.name ==
+          obj.userData.type + obj.userData.lineID + `-${obj.userData.color}`
+        ) {
+          chlid.cartoon[0] && chlid.cartoon[0].stop();
+          chlid.cartoon[1] && chlid.cartoon[1].stop();
+          this.lightFlashingList.splice(index, 1);
+          status = true;
+        }
+      });
+      if (status) {
+        obj.material.lightMap = null;
+        obj.material.lightMapIntensity = -3;
+        this.container.removeBloom(obj);
+      }
+    }
+  }
+
+  // 发送mqtt请求
+  sendMqTT() {
+    let idList = [
+      {
+        deviceId: "cf9abc894c434ef28b6e657e38efa33d",
+        deviceSecret: "T05TZcYApErwnn1I",
+      },
+      {
+        deviceId: "af83c8c0603a4d418330eda498ececf0",
+        deviceSecret: "axu8NwzbKHWDpxhw",
+      },
+      {
+        deviceId: "96845588d8d44e0bb2a1cd5200dea250",
+        deviceSecret: "XxTG79b34jS44jhN",
+      },
+      {
+        deviceId: "a8a35cd8e33a4ddc88b78d22dd675ee1",
+        deviceSecret: "AKrDmJQ02LLpMqfd",
+      },
+      {
+        deviceId: "d87ae360512449d5a98f7a80e1273f1a",
+        deviceSecret: "HS2M1OFdGdG3Dyrs",
+      },
+      {
+        deviceId: "44d41be00f5d496ca36a6c52e41f11d6",
+        deviceSecret: "sSqGkI28rMTACrEY",
+      },
+      {
+        deviceId: "0791a7c08c9846abbcf633d1215551e0",
+        deviceSecret: "LdwWCpmSZITFwTAJ",
+      },
+      {
+        deviceId: "062bacc0e73b4157896192f582c806e4",
+        deviceSecret: "wA5FnTF66kOGacZr",
+      },
+      {
+        deviceId: "435b48e10e6245b491c84398fe37d3f8",
+        deviceSecret: "Z8gfQU4zZgmGjxvf",
+      },
+      {
+        deviceId: "ee942b49724c4fa3a0784d0135121243",
+        deviceSecret: "JRmxfOfTgcHDEZyp",
+      },
+      {
+        deviceId: "e78ea1b1f9d946dc82236884405a659b",
+        deviceSecret: "ssoS3oIjPuIweWkt",
+      },
+      {
+        deviceId: "f75456124a1c4cedb59fcf656a6c98a8",
+        deviceSecret: "tDNS1ZMl7h6Dy9Dj",
+      },
+    ];
+
+    idList.forEach((chlid, index) => {
+      const client = (window as any).mqtt.connect("ws://10.18.0.248:3883/mqtt", {
+        clientId: `pp:${chlid.deviceId}`,
+        username: chlid.deviceId,
+        password: `${chlid.deviceId}:${chlid.deviceSecret}`,
+      });
+      client.on("connect", function () {
+        client.subscribe(`data/${chlid.deviceId}/stream`, function (err: any) {
+          if (!err) {
+            client.publish("presence", "Hello mqtt");
+          }
+        });
+      });
+      client.on("message", (topic: any, message: any) => {
+        this.updateData(JSON.parse(message.toString()), index);
+      });
+    });
+  }
+  updateData(newData: any, i: number) {
+    this.ajaxData.forEach((chlid, index) => {
+      if (index == i) {
+        let temp: any = {};
+        Object.assign(temp, newData);
+        let keys = Object.keys(temp);
+        let tempData: any = {};
+        for (let i = 0; i < keys.length; i++) {
+          tempData[keys[i]] = parseInt(temp[keys[i]]);
+        }
+        chlid.data = tempData;
+      }
+    });
+  }
+  // 灯状态differ
+  objDiffer(obj1: any, obj2: any) {
+    if (!obj1 || !obj2) return;
+    let newObj = Object.assign({}, obj1);
+    let newObjKeys = Object.keys(newObj);
+    let oldObj = Object.assign({}, obj2);
+    let oldObjKeys = Object.keys(oldObj);
+    if (newObjKeys.length != oldObjKeys.length) {
+      return false;
+    } else {
+      if (newObjKeys.length > 0) {
+        if (
+          newObj.red != oldObj.red ||
+          newObj.green != oldObj.green ||
+          newObj.yellow != oldObj.yellow
+        ) {
+          return false;
+        } else {
+          return true;
+        }
+      }
+      return true;
+    }
+  }
+  // 关闭开启鼠标功能
+  mouseLockToggle(bool: boolean) {
+    this.container.orbitControls.enablePan = bool;
+    this.container.orbitControls.enableRotate = bool;
+    this.container.orbitControls.enableZoom = bool;
+  }
+  tipPopup() {
+    this.options.popPositionList.forEach((chlid: any) => {
+      let scale = 3;
+      if (chlid.floorIndex == 2) scale = 1.5;
+      let position = [chlid.position.x, chlid.position.y + 2, chlid.position.z];
+      let pop: any = new Bol3D.POI.Icon({
+        position: [...position],
+        scale: [scale, scale],
+        sizeAttenuation: true,
+        publicPath: this.PRO_ENV,
+        url: "3d/textures/箭头.png",
+      });
+      pop.center.y = 0;
+      pop.visible = false;
+      pop.userData.type = chlid.name;
+      pop.userData.position = chlid.position;
+      pop.userData.floorIndex = chlid.floorIndex;
+      if (chlid.floorIndex == 3) {
+        pop.userData.line = chlid.line;
+        pop.userData.get = true;
+        pop.userData.parentPos = chlid.position;
+        this.options.floor3_Icon_Click.push(pop);
+      } else if (chlid.floorIndex == 2) {
+        pop.userData.parentName = chlid.name;
+        pop.userData.id = chlid.id;
+        pop.userData.pos = chlid.pos;
+        this.options.floor2_Icon_Click.push(pop);
+      }
+      this.container.attach(pop);
+      this.container.addBloom(pop);
+      this.options.tipPOpupList.push(pop);
+    });
+  }
+
+  tipPopupMove() {
+    this.options.tipPOpupList.forEach((chlid: any) => {
+      new Bol3D.TWEEN.Tween(chlid.position)
+        .to({ y: chlid.userData.position.y + 2 }, 1000)
+        .start()
+        .onComplete(() => {
+          new Bol3D.TWEEN.Tween(chlid.position)
+            .to({ y: chlid.userData.position.y }, 1000)
+            .start()
+            .onComplete(() => {
+              this.tipPopupState = 0;
+            });
+        });
+    });
+  }
+
+  // 流光生成函数
+  lineContorl(obj: any, lineWidth: number, speedNum: number, color: any, attenuation: boolean) {
+    // obj:流光对象 lineWidth：线宽 speedNum：速度 color：颜色 attenuation:流动衰减 true/false
+    obj = new Bol3D.KLine2({
+      lineWidth: lineWidth,
+      speed: speedNum,
+      color: color,
+      attenuation: attenuation,
+    });
+    return obj;
+  }
+
+  // 流光生成
+  liuGuang() {
+    const lineArr: Array<any> = ["line", "line1", "line2"];
+    const linePosition = [
+      [
+        228.2, 50, -199.12, -468.01, 50, -199.0, -468.03, 50, 231.17, -331.5, 50,
+        231.24, -331.48, 50, 280.04, 81.8, 50, 279.96, 81.82, 50, 231.13, 228.17,
+        50, 231.01, 228.2, 50, -199.12,
+      ],
+      [
+        228.2, 78, -199.12, -468.01, 78, -199.0, -468.03, 78, 231.17, -331.5, 78,
+        231.24, -331.48, 78, 280.04, 81.8, 78, 279.96, 81.82, 78, 231.13, 228.17,
+        78, 231.01, 228.2, 78, -199.12,
+      ],
+      [
+        228.2, 108, -199.12, -468.01, 108, -199.0, -468.03, 108, 231.17, -331.5,
+        108, 231.24, -331.48, 108, 280.04, 81.8, 108, 279.96, 81.82, 108, 231.13,
+        228.17, 108, 231.01, 228.2, 108, -199.12,
+      ],
+    ];
+    lineArr.forEach((child, index) => {
+      child = this.lineContorl(child, 4, 1, "#5697ef", true);
+      child.setPositions(linePosition[index]);
+      child.visible = false;
+      this.container.attach(child);
+      this.container.addBloom(child);
+      child.userData.id = index + 1;
+      this.options.LineTimeList.push(child);
+    });
+  }
+  // 机器人产线弹窗
+  robitPopup(isFocus: boolean, key: number, obj: any, point: Bol3D.Vector3, offset?: any) {
+    getDT_RobotProcessData({ FWorkShop: key }).then((res) => {
+      let type = "robit";
+      let name = "机器人生产线" + key;
+      let data = "";
+      if (res) {
+        type = "robit";
+        res.data.forEach((chlid: any) => {
+          if (chlid.fworkSection == obj.userData.id) data = chlid;
+        });
+      }
+      // 假数据
+      if (!data) {
+        this.options.robitTempData.forEach((chlid: any) => {
+          if (chlid.line == key && obj.userData.id == chlid.fworkSection)
+            data = chlid;
+        });
+      }
+
+      this.popupChange(type, name, data, () => {
+        if (obj.type != "Icon") {
+          this.options.popupObj.position.set(point.x, point.y + 15, point.z);
+        } else {
+          let pos = obj.userData.pos;
+          this.options.popupObj.position.set(pos.x, pos.y + 15, pos.z);
+        }
+        if (isFocus) {
+          this.sceneMove(
+            [this.options.popupObj.position.x, this.options.popupObj.position.y, this.options.popupObj.position.z],
+            [
+              this.options.popupObj.position.x + 1,
+              this.options.popupObj.position.y + 50,
+              this.options.popupObj.position.z - 100,
+            ],
+            500
+          );
+        }
+      });
+    });
+  };
+  // 3楼设备弹窗
+  equitPopup(isFocus: boolean, obj: any, offset?: any) {
+    let name = obj.userData.type;
+    let position = obj.userData.parentPos;
+    let production;
+    this.ajaxData.forEach((child) => {
+      if (
+        child.type == name &&
+        child.lineID == obj.userData.line
+        // child.data.count != undefined &&
+        // child.data.red != undefined &&
+        // child.data.green != undefined &&
+        // child.data.yellow != undefined
+      ) {
+        let tempObj = { count: 0, red: 0, green: 0, yellow: 0 };
+        production = Object.assign(tempObj, child.data);
+      }
+    });
+    let type = "none";
+    if (production) type = "normal";
+    if (isFocus) {
+      this.changeSpriteMap(true, name, [50, 35], [position.x, position.y, position.z]);
+    }
+    this.popupChange(type, name, production, () => {
+      if (isFocus) {
+        this.options.popupObj.position.set(position.x, position.y + 20, position.z + 20);
+        this.sceneMove(
+          [this.options.popupObj.position.x, this.options.popupObj.position.y, this.options.popupObj.position.z],
+          [
+            this.options.popupObj.position.x + 3,
+            this.options.popupObj.position.y + 78,
+            this.options.popupObj.position.z - 138,
+          ],
+          500
+        );
+      } else {
+        this.options.popupObj.scale.set(0.05, 0.05);
+        this.options.popupObj.position.set(
+          position.x + offset[0],
+          position.y + offset[1],
+          position.z + offset[2]
+        );
+      }
+    });
+  };
+  // 2楼弹窗
+  floorPopupRequest(obj: any) {
+    let key = obj.userData.parentName == "robit1" ? 1 : 2;
+    let type = "robit";
+    let name = "机器人生产线" + key;
+    let data = "";
+    let resData = key == 1 ? this.options.robitData1 : this.options.robitData2;
+    if (resData) {
+      resData.forEach((chlid: any) => {
+        if (chlid.fworkSection == obj.userData.id) data = chlid;
+      });
+    }
+    // 假数据
+    if (!data) {
+      this.options.robitTempData.forEach((chlid: any) => {
+        if (chlid.line == key && obj.userData.id == chlid.fworkSection)
+          data = chlid;
+      });
+    }
+    this.popupChange(type, name, data, () => {
+      let pos = obj.userData.popupPos;
+      this.options.popupObj.scale.set(0.03, 0.03);
+      this.options.popupObj.position.set(pos.x, pos.y + 5, pos.z);
+    });
+    let li: any = [];
+    this.options.floor2_outline.forEach((chlid: any) => {
+      if (
+        chlid.userData.parentName == obj.userData.parentName &&
+        chlid.userData.id == obj.userData.id
+      )
+        li.push(chlid);
+    });
+    this.container.outlineObjects = [...li];
+  };
+
+  robitCruise(callback?: Function) {
+    if (this.isPause) {
+      this.smt_Pause();
+      return;
+    }
+    this.isPause = true;
+    if (this.floor2_Cartoon.length > 0) {
+      this.floor2_Cartoon.forEach((chlid: any) => {
+        if (chlid) chlid.stop();
+      });
+    }
+    let robitSceneList = [
+      { point: [-267, 47, 103], look: [-271, 105, -12], time: 2000 },
+      { point: [-297, 47, 85], look: [-321, 77, 32], time: 2000 },
+      { point: [-276, 47, 85], look: [-301, 77, 35], time: 2000 },
+      { point: [-276, 47, 85], look: [-301, 77, 35], time: 2000 },
+      { point: [-271, 47, 85], look: [-295, 77, 35], time: 2000 },
+      { point: [-271, 47, 85], look: [-295, 77, 35], time: 2000 },
+      { point: [-254, 47, 85], look: [-278, 77, 35], time: 2000 },
+      { point: [-254, 47, 85], look: [-278, 77, 35], time: 2000 },
+      { point: [-248, 47, 85], look: [-266, 77, 35], time: 2000 },
+      { point: [-248, 47, 85], look: [-266, 77, 35], time: 2000 },
+      { point: [-244, 47, 85], look: [-264, 77, 35], time: 2000 },
+      { point: [-244, 47, 85], look: [-264, 77, 35], time: 2000 },
+      { point: [-242, 47, 85], look: [-262, 77, 35], time: 2000 },
+      { point: [-242, 47, 85], look: [-262, 77, 35], time: 2000 },
+      { point: [-235, 47, 85], look: [-260, 77, 35], time: 2000 },
+      { point: [-235, 47, 85], look: [-260, 77, 35], time: 2000 },
+      { point: [-231, 47, 85], look: [-256, 77, 34], time: 2000 },
+      { point: [-231, 47, 85], look: [-256, 77, 34], time: 2000 },
+      { point: [-227, 47, 85], look: [-252, 77, 34], time: 2000 },
+      { point: [-227, 47, 85], look: [-252, 77, 34], time: 2000 },
+      { point: [-223, 47, 85], look: [-248, 77, 34], time: 2000 },
+      { point: [-223, 47, 85], look: [-248, 77, 34], time: 2000 },
+      { point: [-211, 47, 88], look: [-236, 77, 34], time: 2000 }, //
+      { point: [-230, 47, 87], look: [-198, 101, 83], time: 2000 }, //
+      { point: [-234, 47, 73], look: [-237, 103, 101], time: 2000 },
+      { point: [-234, 47, 73], look: [-237, 103, 101], time: 2000 },
+      { point: [-238, 47, 73], look: [-241, 103, 100], time: 2000 },
+      { point: [-238, 47, 73], look: [-241, 103, 100], time: 2000 },
+      { point: [-240, 47, 72], look: [-243, 103, 100], time: 2000 },
+      { point: [-240, 47, 72], look: [-243, 103, 100], time: 2000 },
+      { point: [-243, 47, 72], look: [-246, 103, 100], time: 2000 },
+      { point: [-243, 47, 72], look: [-246, 103, 100], time: 2000 },
+      { point: [-257, 47, 71], look: [-260, 103, 99], time: 2000 },
+      { point: [-257, 47, 71], look: [-260, 103, 99], time: 2000 },
+      { point: [-262, 47, 71], look: [-265, 103, 99], time: 2000 },
+      { point: [-262, 47, 71], look: [-265, 103, 99], time: 2000 },
+      { point: [-265, 47, 71], look: [-268, 103, 99], time: 2000 },
+      { point: [-265, 47, 71], look: [-268, 103, 99], time: 2000 },
+      { point: [-269, 47, 71], look: [-272, 103, 99], time: 2000 },
+      { point: [-269, 47, 71], look: [-272, 103, 99], time: 2000 },
+      { point: [-286, 47, 69], look: [-289, 103, 97], time: 2000 },
+      { point: [-286, 47, 69], look: [-289, 103, 97], time: 2000 },
+      { point: [-289, 47, 70], look: [-292, 103, 98], time: 2000 },
+      { point: [-289, 47, 70], look: [-292, 103, 98], time: 2000 },
+      { point: [-302, 47, 70], look: [-305, 103, 98], time: 2000 }, //
+      { point: [-302, 47, 70], look: [-332, 102, 67], time: 2000 }, //
+      { point: [-302, 47, 71], look: [-317, 93, 31], time: 2000 }, //
+      { point: [-111, 47, 101], look: [-126, 424, -537], time: 2000 }, //
+    ];
+
+    let sceneList: any = this.sceneChange(robitSceneList);
+    this.floor2_Cartoon = [...sceneList.flat()];
+    for (let i = 0; i < sceneList[0].length - 1; i++) {
+      sceneList[0][i].chain(sceneList[0][i + 1]);
+      sceneList[1][i].chain(sceneList[1][i + 1]);
+    }
+    this.mouseLockToggle(false);
+    sceneList[0][0].start();
+    sceneList[1][0].start();
+    let popupSceneList = [
+      2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42,
+    ];
+    this.options.floor2RobitObject.forEach((chlid: any, index: number) => {
+      sceneList[1][popupSceneList[index]].onComplete(() => {
+        this.floorPopupRequest(chlid.obj);
+      });
+      sceneList[1][popupSceneList[index] + 1].onComplete(() => {
+        this.options.popupObj.visible = false;
+      });
+    });
+    sceneList[1][sceneList[1].length - 1].onComplete(() => {
+      this.isPause = false;
+      this.floor2_Cartoon = [];
+      this.mouseLockToggle(true);
+      this.container.outlineObjects = [];
+      callback && callback();
+    });
+  };
+
 }
