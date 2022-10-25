@@ -14,7 +14,7 @@ const routes = [
   },
   {
     path: "/thirdly",
-    component: () => import("@/2d/components/views/ThirdPage.vue"),
+    component: () => import("@/2d/components/views/SwitchLine.vue"),
   },
 ];
 const routers = createRouter({

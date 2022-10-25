@@ -856,4 +856,583 @@ export const echart = {
       ],
     };
   },
+  seriesLine() {
+    let data1 = [
+      {
+        value: 120,
+        name: "1月",
+      },
+      {
+        value: 120,
+        name: "2月",
+      },
+      {
+        value: 130,
+        name: "3月",
+      },
+      {
+        value: 140,
+        name: "4月",
+      },
+      {
+        value: 120,
+        name: "5月",
+      },
+      {
+        value: 120,
+        name: "6月",
+      },
+    ];
+    let data2 = [
+      {
+        value: 140,
+        name: "1月",
+      },
+      {
+        value: 150,
+        name: "2月",
+      },
+      {
+        value: 160,
+        name: "3月",
+      },
+      {
+        value: 120,
+        name: "4月",
+      },
+      {
+        value: 170,
+        name: "5月",
+      },
+      {
+        value: 160,
+        name: "6月",
+      },
+    ];
+    return {
+      grid: {
+        top: "20%",
+        left: "5%",
+        right: "5%",
+        bottom: "5%",
+        containLabel: true,
+      },
+      tooltip: {
+        trigger: "axis",
+      },
+      legend: {
+        icon: "roundRect",
+        top: "3%",
+        itemWidth: 12,
+        itemHeight: 12,
+        itemStyle: {
+          borderWidth: 1,
+          borderRadius: 2,
+        },
+        textStyle: {
+          color: "#fff",
+          fontSize: 14,
+        },
+      },
+      yAxis: [
+        {
+          type: "value",
+          axisLine: {
+            show: true,
+            lineStyle: {
+              color: "rgba(255,255,255,.4)",
+            },
+          },
+          axisLabel: {
+            color: "#fff",
+            fontSize: 12,
+          },
+          splitLine: {
+            lineStyle: {
+              color: {
+                type: "linear",
+                x: 0,
+                y: 1,
+                x2: 0,
+                y2: 0,
+                colorStops: [
+                  {
+                    offset: 0,
+                    color: "rgba(255,255,255,.2)",
+                  },
+                  {
+                    offset: 0.5,
+                    color: "rgba(255,255,255,.4)",
+                  },
+                  {
+                    offset: 1,
+                    color: "rgba(255,255,255,.2)",
+                  },
+                ],
+              },
+            },
+          },
+        },
+      ],
+      xAxis: [
+        {
+          type: "category",
+          data: data1.map((item) => item.name),
+          axisLabel: {
+            color: "#fff",
+            fontSize: 12,
+          },
+          boundaryGap: false,
+          axisLine: {
+            show: true,
+            lineStyle: {
+              color: "rgba(255,255,255,.4)",
+            },
+          },
+          axisTick: {
+            show: false,
+          },
+        },
+      ],
+      series: [
+        {
+          type: "line",
+          name: "设备效率OEE",
+          areaStyle: {
+            color: "rgba(81, 212, 255, .3)",
+          },
+          symbol: "circle",
+          lineStyle: {
+            color: "rgba(81, 212, 255, 1)",
+          },
+          itemStyle: {
+            color: "rgba(81, 212, 255, .2)",
+            borderWidth: 1,
+            borderColor: "rgba(81, 212, 255, 1)",
+          },
+          data: data1,
+        },
+        {
+          type: "line",
+          name: "产能利用率PEEP",
+          areaStyle: {
+            color: "rgba(255, 232, 81, .3)",
+          },
+          symbol: "circle",
+          lineStyle: {
+            color: "rgba(255, 232, 81, 1)",
+          },
+          itemStyle: {
+            color: "rgba(255, 232, 81, .2)",
+            borderWidth: 1,
+            borderColor: "rgba(255, 232, 81, 1)",
+          },
+          data: data2,
+        },
+      ],
+    };
+  },
+  seriesBar4() {
+    const colors = ["#FEEB5D", "#29F6FE", "#19FF34", "#FE1934"];
+    const data = [
+      {
+        value: 2,
+        bili: 59,
+        name: "贴片",
+      },
+      {
+        value: 1,
+        bili: 64,
+        name: "压焊",
+      },
+      {
+        value: 4,
+        bili: 63,
+        name: "封装",
+      },
+      {
+        value: 6,
+        bili: 39,
+        name: "印刷",
+      },
+    ];
+    let max = data.map((item) => item.value).sort((a, b) => b - a)[0];
+    // max = Math.ceil(max / 1000) * 1000;
+    max = 10;
+    let data1: Array<any> = [];
+    let data2: Array<any> = [];
+    data.forEach((item, index) => {
+      data1.push({
+        ...item,
+        itemStyle: {
+          color: {
+            type: "linear",
+            x: 0,
+            y: 0,
+            x2: 1,
+            y2: 0,
+            colorStops: [
+              {
+                offset: 0,
+                color: "rgba(0,0,0,0)",
+              },
+              {
+                offset: 0.8,
+                color: colors[index],
+              },
+              {
+                offset: 1,
+                color: "#fff",
+              },
+            ],
+          },
+        },
+      });
+      data2.push({
+        value: max,
+        itemStyle: {
+          color: hexToRgba(colors[index], 0.1),
+          borderWidth: 1,
+          borderColor: {
+            type: "linear",
+            x: 0,
+            y: 0,
+            x2: 1,
+            y2: 0,
+            colorStops: [
+              {
+                offset: 0,
+                color: colors[index],
+              },
+              {
+                offset: 1,
+                color: hexToRgba(colors[index], 0.5),
+              },
+            ],
+          },
+        },
+      });
+    });
+    return {
+      grid: {
+        left: "3%",
+        top: "10%",
+        bottom: "3%",
+        right: "3%",
+        containLabel: true,
+      },
+      xAxis: [
+        {
+          type: "value",
+          axisLine: {
+            show: true,
+            lineStyle: {
+              color: "rgba(255,255,255,.6)",
+            },
+          },
+          max,
+          axisTick: {
+            show: true,
+            length: 3,
+          },
+          axisLabel: {
+            color: "#fff",
+            fontSize: 12,
+          },
+          splitLine: {
+            show: false,
+          },
+        },
+      ],
+      yAxis: [
+        {
+          type: "category",
+          data: data.map((item) => item.name),
+          axisLine: {
+            show: false,
+          },
+          axisTick: {
+            show: false,
+          },
+          axisLabel: {
+            color: "#fff",
+            fontSize: 12,
+          },
+          inverse: true,
+        },
+        {
+          show: false,
+          type: "category",
+          data: data.map((item) => item.bili),
+          axisLine: {
+            show: false,
+          },
+          axisTick: {
+            show: false,
+          },
+          axisLabel: {
+            color: "#fff",
+            fontSize: 12,
+            formatter: "{value}%",
+          },
+          inverse: true,
+        },
+      ],
+      series: [
+        {
+          type: "bar",
+          barWidth: 10,
+          itemStyle: {
+            borderRadius: 5,
+          },
+          label: {
+            show: true,
+            position: "right",
+            fontSize: 12,
+            color: "#fff",
+          },
+          data: data1,
+        },
+        {
+          type: "bar",
+          barWidth: 20,
+          barGap: "-150%",
+          data: data2,
+        },
+      ],
+    };
+  },
+  seriesBar5() {
+    let colors = ["#20EDFF", "#FFFFFF", "#FFEB0C"];
+    let data1 = [
+      {
+        value: 160,
+        name: "5月",
+      },
+      {
+        value: 240,
+        name: "6月",
+      },
+      {
+        value: 90,
+        name: "7月",
+      },
+      {
+        value: 220,
+        name: "8月",
+      },
+      {
+        value: 140,
+        name: "9月",
+      },
+      {
+        value: 300,
+        name: "10月",
+      },
+      {
+        value: 150,
+        name: "11月",
+      },
+    ];
+    let data2 = [
+      {
+        value: 140,
+        name: "5月",
+      },
+      {
+        value: 220,
+        name: "6月",
+      },
+      {
+        value: 50,
+        name: "7月",
+      },
+      {
+        value: 200,
+        name: "8月",
+      },
+      {
+        value: 110,
+        name: "9月",
+      },
+      {
+        value: 250,
+        name: "10月",
+      },
+      {
+        value: 120,
+        name: "11月",
+      },
+    ];
+    let data3 = [
+      {
+        value: 13,
+        name: "5月",
+      },
+      {
+        value: 22,
+        name: "6月",
+      },
+      {
+        value: 19,
+        name: "7月",
+      },
+      {
+        value: 20,
+        name: "8月",
+      },
+      {
+        value: 13,
+        name: "9月",
+      },
+      {
+        value: 20,
+        name: "10月",
+      },
+      {
+        value: 15,
+        name: "11月",
+      },
+    ];
+    return {
+      grid: {
+        top: "20%",
+        left: "5%",
+        right: "5%",
+        bottom: "5%",
+        containLabel: true,
+      },
+      tooltip: {
+        trigger: "axis",
+      },
+      legend: {
+        top: "3%",
+        itemWidth: 21,
+        itemHeight: 9,
+        itemStyle: {
+          borderWidth: 1,
+          borderRadius: 2,
+        },
+        textStyle: {
+          color: "#fff",
+          fontSize: 14,
+        },
+      },
+      yAxis: [
+        {
+          type: "value",
+          axisLine: {
+            show: true,
+            lineStyle: {
+              color: "rgba(255,255,255,.4)",
+            },
+          },
+          axisLabel: {
+            color: "#fff",
+            fontSize: 12,
+          },
+          splitLine: {
+            show: false,
+          },
+        },
+        {
+          type: "value",
+          axisLine: {
+            show: true,
+            lineStyle: {
+              color: "rgba(255,255,255,.4)",
+            },
+          },
+          axisLabel: {
+            color: "#fff",
+            fontSize: 12,
+            formatter: "{value}%",
+          },
+          splitLine: {
+            show: false,
+          },
+        },
+      ],
+      xAxis: [
+        {
+          type: "category",
+          data: data1.map((item) => item.name),
+          axisLabel: {
+            color: "#fff",
+            fontSize: 12,
+          },
+          axisLine: {
+            show: false,
+          },
+          axisTick: {
+            show: false,
+          },
+        },
+      ],
+      series: [
+        {
+          type: "bar",
+          name: "2020年",
+          data: data1,
+          itemStyle: {
+            borderWidth: 1,
+            borderColor: "#20EDFF",
+            color: {
+              type: "linear",
+              x: 0,
+              y: 1,
+              x2: 0,
+              y2: 0,
+              colorStops: [
+                {
+                  offset: 1,
+                  color: "#20EDFF",
+                },
+                {
+                  offset: 0,
+                  color: "rgba(255,255,255,0)",
+                },
+              ],
+            },
+          },
+          barWidth: 7,
+        },
+        {
+          type: "bar",
+          name: "2019年",
+          data: data2,
+          itemStyle: {
+            borderWidth: 1,
+            borderColor: "#FFFFFF",
+            color: {
+              type: "linear",
+              x: 0,
+              y: 1,
+              x2: 0,
+              y2: 0,
+              colorStops: [
+                {
+                  offset: 1,
+                  color: "#FFFFFF",
+                },
+                {
+                  offset: 0,
+                  color: "rgba(255,255,255,0)",
+                },
+              ],
+            },
+          },
+          barWidth: 7,
+        },
+        {
+          type: "line",
+          name: "同比增长",
+          yAxisIndex: 1,
+          symbol: "circle",
+          color: "#FFEB0C",
+          data: data3,
+        },
+      ],
+    };
+  },
 };
