@@ -401,7 +401,10 @@ export default class CreateScene {
               if (chlid.name == "SMT_I") this.options.Smt1 = chlid;
               if (chlid.name == "SMT_II") this.options.Smt2 = chlid;
               if (chlid.name == "SMT_III") this.options.Smt3 = chlid;
-              if (chlid.name == "zhujianzhu") this.options.mainBuilding = chlid;
+              if (chlid.name == "zhujianzhu") {
+                 this.options.mainBuilding = chlid; 
+                  console.log( this.options.mainBuilding,'222222222')
+                }
               chlid.traverse((chi: any) => {
                 if (chi.isMesh) chi.userData.opacity = chi.material.opacity;
               });
@@ -488,7 +491,7 @@ export default class CreateScene {
           });
         },
         onLoad: () => {
-          this.addMouseEvent();
+          // this.addMouseEvent();
           getDT_RobotProcessData({ FWorkShop: 1 }).then((res: any) => {
             if (res) this.options.robitData1 = res.data;
           });
@@ -513,9 +516,10 @@ export default class CreateScene {
           });
           this.container.sky.name = "SKY";
           this.options.clickObjetcArr = [
-            tempArr,
+            ...tempArr,
             this.container.sky,
           ];
+
           this.container.clickObjects = [...this.options.clickObjetcArr];
           // 镜面1
           [
@@ -541,7 +545,7 @@ export default class CreateScene {
           );
           // 白色员工命名
           this.options.whiteStaffList.forEach((chlid: any, index: number) => {
-            chlid.name = this.options.whiteStaffName[index].name;
+            chlid.name = this.options.whiteStaffName[index]?.name;
             chlid.userData.id = this.options.whiteStaffName[index].id;
             chlid.position.set(...this.options.whiteStaffName[index].position);
             chlid.rotation.y = this.options.whiteStaffName[index].angle;
@@ -570,6 +574,7 @@ export default class CreateScene {
                 if (item.name == chlid.name) {
                   item.userData.id = 1;
                   chlid.userData.parentName = this.options.mainBuilding.name;
+                  console.log( chlid.userData.parentName,'1ssssssssss')
                 } else {
                   item.visible = false;
                   this.options.floorOtherMesh_1.push(item);
@@ -620,6 +625,7 @@ export default class CreateScene {
           callback && callback();
         },
       });
+      this.addMouseEvent()
     }
   }
   addMouseEvent() {
@@ -628,6 +634,7 @@ export default class CreateScene {
     this.mouseCartoon = [];
     events.onhover = (e: any) => {
       let object = e.objects[0].object;
+      console.log(object.userData.id,'id')
       if (object.userData.parentName == this.options.mainBuilding.name) {
         // 楼层加勾边
         if (this.clickIndex > 0 && this.options.floorIndex == 0) {
@@ -1046,7 +1053,7 @@ export default class CreateScene {
     this.options.waibu1.visible = false;
     this.options.waibu2.visible = false;
     this.options.AGV.visible = false;
-    this.options.GV1.visible = false;
+    this.options.AGV1.visible = false;
     this.options.MirrorMaterial1.visible = false;
     this.options.MirrorMaterial2.visible = false;
     let arr = [
@@ -1054,6 +1061,7 @@ export default class CreateScene {
       this.options.LouCheng2,
       this.options.LouCheng3,
     ];
+    console.log(arr,'test')
     arr.forEach((chlid) => {
       chlid.position.y = chlid.userData.position.y - 50;
     });
@@ -1744,7 +1752,7 @@ export default class CreateScene {
     let img = new Image();
     img.src = this.PRO_ENV + "3d/textures/p1.png";
     img.onload = () => {
-      c.drawImage(this, 0, 0, 241, 187);
+      c.drawImage(img, 0, 0, 241, 187);
       c.fillStyle = "#0fefe2"; //文本填充颜色
       c.font = "bold 15px 微软雅⿊"; //字体样式设置
       c.textBaseline = "top"; //文本与fillText定义的纵坐标            top hanging middle  ideographic bottom

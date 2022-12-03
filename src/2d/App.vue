@@ -40,10 +40,10 @@
 
 <script setup lang="ts">
 import { LoadingOutlined } from "@ant-design/icons-vue";
-import { defineComponent, h, ref, shallowRef, onMounted } from "vue";
+import { defineComponent, h, ref, shallowRef, onMounted, watch } from "vue";
 import { formatterDate } from "@/2d/unitls/util";
 import { useRoute, useRouter } from "vue-router";
-import { pageOnload } from "@/3d/index";
+import { pageOnload, switchLouc, back } from "@/3d/index";
 const route = useRoute();
 const router = useRouter();
 const canvasBox = ref(null);
@@ -102,6 +102,26 @@ const animationRun = (index: number) => {
 onMounted(() => {
   pageOnload(canvasBox.value as any);
 });
+
+watch(
+  () => route.path,
+  (path) => {
+    switch (path) {
+      case "/":
+        back();
+        break;
+      case "/first":
+        switchLouc(1);
+        break;
+      case "/second":
+        switchLouc(2);
+        break;
+      case "/thirdly":
+        switchLouc(3);
+        break;
+    }
+  }
+);
 </script>
 
 <style lang="less">

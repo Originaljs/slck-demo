@@ -46083,7 +46083,7 @@ function ascSort( a, b ) {
 
 function intersectObject( object, raycaster, intersects, recursive ) {
 
-	if ( object.layers.test( raycaster.layers ) ) {
+	if ( object.layers?.test( raycaster.layers ) ) {
 
 		object.raycast( raycaster, intersects );
 
